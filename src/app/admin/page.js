@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ShieldCheck, UserCheck, RefreshCw, Smartphone, Award, Trophy, Save, Trash2, ShieldAlert } from 'lucide-react';
+import styles from './admin.module.css';
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -117,6 +118,33 @@ export default function AdminDashboard() {
       verifyAndLoad(adminToken);
     } catch (err) {
       setError(err.message || 'Error al actualizar.');
+    }
+  };
+
+  const handleDeleteUser = async (dni) => {
+    setError('');
+    setSuccess('');
+    if (!confirm('¿Estás seguro que deseas borrar a este usuario pendiente de aprobación?')) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/admin/users?dni=${dni}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${adminToken}`
+        }
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Error al eliminar usuario.');
+
+      setSuccess(`Usuario con DNI ${dni} eliminado correctamente.`);
+      
+      // Recargar lista de usuarios
+      verifyAndLoad(adminToken);
+    } catch (err) {
+      setError(err.message || 'Error al eliminar.');
     }
   };
 
@@ -244,16 +272,16 @@ export default function AdminDashboard() {
   // Si no está autenticado, mostrar formulario de login admin
   if (!isAuthenticated) {
     return (
-      <main style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-main)', padding: '1.5rem' }}>
-        <div className="card animate-fade-in" style={{ width: '100%', maxWidth: '400px' }}>
-          <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+      <main className={styles.loginWrapper}>
+        <div className={`card animate-fade-in ${styles.loginCard}`}>
+          <div className={styles.loginHeader}>
             <ShieldAlert size={48} style={{ color: 'var(--accent)', marginBottom: '0.5rem' }} />
-            <h1 style={{ fontSize: '1.6rem', fontWeight: '800' }}>Panel de Control</h1>
-            <p style={{ color: 'var(--text-secondary)' }}>Ingresá la clave de administrador para continuar.</p>
+            <h1 className={styles.loginTitle}>Panel de Control</h1>
+            <p className={styles.loginDesc}>Ingresá la clave de administrador para continuar.</p>
           </div>
 
           {error && (
-            <div style={{ padding: '0.75rem', background: 'rgba(231, 76, 60, 0.15)', border: '1px solid var(--danger)', color: '#ff9c9c', borderRadius: 'var(--radius-sm)', marginBottom: '1rem', fontSize: '0.95rem', textAlign: 'center' }}>
+            <div className={styles.loginError}>
               {error}
             </div>
           )}
@@ -280,13 +308,15 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-main)' }}>
+    <div className={styles.adminContainer}>
       
       {/* Navbar de Admin */}
-      <nav className="navbar" style={{ background: '#0e0505', borderBottom: '1px solid rgba(231, 76, 60, 0.2)' }}>
+      <nav className={`navbar ${styles.navbarAdmin}`}>
         <div className="nav-brand">
           <ShieldCheck style={{ color: 'var(--danger)' }} />
-          <span className="nav-title" style={{ background: 'linear-gradient(to right, #ff7a7a, var(--accent))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+          <img src="/chimipesca-logo.jpg" alt="Logo ChimiPesca" className="nav-logo" style={{ width: '40px', height: '40px' }} />
+          <img src="/mundial-logo.jpg" alt="Logo Mundial 2026" className={`nav-logo ${styles.logoNavMundial}`} style={{ width: '40px', height: '40px' }} />
+          <span className={`nav-title ${styles.navbarTitleAdmin} hide-mobile`}>
             Chimi Prode - ADMINISTRACIÓN
           </span>
         </div>
@@ -296,7 +326,7 @@ export default function AdminDashboard() {
       </nav>
 
       {/* Cuerpo principal */}
-      <main className="container" style={{ flexGrow: 1, paddingTop: '1.5rem', paddingBottom: '5rem' }}>
+      <main className={`container ${styles.mainContent}`}>
         
         {/* Avisos */}
         {error && (
@@ -314,46 +344,28 @@ export default function AdminDashboard() {
         )}
 
         {/* Tab Selector */}
-        <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', marginBottom: '2rem', gap: '1rem' }}>
+        <div className={styles.tabSelector}>
           <button
             onClick={() => { setActiveTab('payments'); setError(''); setSuccess(''); }}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              borderBottom: activeTab === 'payments' ? '3px solid var(--accent)' : '3px solid transparent',
-              color: activeTab === 'payments' ? 'white' : 'var(--text-secondary)',
-              padding: '1rem 0.5rem',
-              fontSize: '1.1rem',
-              fontWeight: '700',
-              cursor: 'pointer',
-              flex: 1
-            }}
+            className={`${styles.tabButton} ${activeTab === 'payments' ? styles.tabButtonActive : ''}`}
           >
-            Aprobación de Pagos ({pendingUsers.length} pendientes)
+            <span className="hide-mobile">Aprobación de Pagos ({pendingUsers.length} pendientes)</span>
+            <span className="show-mobile">Pagos ({pendingUsers.length})</span>
           </button>
           
           <button
             onClick={() => { setActiveTab('matches'); setError(''); setSuccess(''); }}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              borderBottom: activeTab === 'matches' ? '3px solid var(--accent)' : '3px solid transparent',
-              color: activeTab === 'matches' ? 'white' : 'var(--text-secondary)',
-              padding: '1rem 0.5rem',
-              fontSize: '1.1rem',
-              fontWeight: '700',
-              cursor: 'pointer',
-              flex: 1
-            }}
+            className={`${styles.tabButton} ${activeTab === 'matches' ? styles.tabButtonActive : ''}`}
           >
-            Cargar Resultados de Partidos
+            <span className="hide-mobile">Cargar Resultados de Partidos</span>
+            <span className="show-mobile">Resultados</span>
           </button>
         </div>
 
         {/* Secciones de las Pestañas */}
         {loading ? (
           <div style={{ textAlign: 'center', padding: '4rem 0' }}>
-            <RefreshCw className="animate-spin" style={{ color: 'var(--accent)', animation: 'spin 1s linear infinite' }} />
+            <RefreshCw className={`animate-spin ${styles.loadingSpinner}`} />
             <p style={{ color: 'var(--text-secondary)', marginTop: '0.5rem' }}>Cargando datos del panel...</p>
           </div>
         ) : (
@@ -363,33 +375,34 @@ export default function AdminDashboard() {
               <div className="animate-fade-in">
                 
                 {/* Resumen Estadístico */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
-                  <div className="card" style={{ padding: '1.25rem', textAlign: 'center', background: 'rgba(255,255,255,0.02)' }}>
-                    <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>TOTAL PARTICIPANTES</span>
-                    <h3 style={{ fontSize: '1.8rem', fontWeight: '800', marginTop: '0.25rem' }}>{users.filter(u => u.rol !== 'admin').length}</h3>
+                <div className={styles.statsGrid}>
+                  <div className={styles.statsCard}>
+                    <span className={styles.statsTitle}>Total Participantes</span>
+                    <h3 className={styles.statsValue}>{users.filter(u => u.rol !== 'admin').length}</h3>
                   </div>
-                  <div className="card" style={{ padding: '1.25rem', textAlign: 'center', background: 'rgba(19, 184, 96, 0.05)', borderColor: 'rgba(19,184,96,0.2)' }}>
-                    <span style={{ fontSize: '0.9rem', color: 'var(--success)' }}>APROBADOS (PAGOS)</span>
-                    <h3 style={{ fontSize: '1.8rem', fontWeight: '800', marginTop: '0.25rem', color: 'var(--success)' }}>{approvedUsers.length}</h3>
+                  <div className={styles.statsCardAproved}>
+                    <span className={styles.statsTitle} style={{ color: 'var(--success)' }}>Aprobados (Pagos)</span>
+                    <h3 className={styles.statsValue} style={{ color: 'var(--success)' }}>{approvedUsers.length}</h3>
                   </div>
-                  <div className="card" style={{ padding: '1.25rem', textAlign: 'center', background: 'rgba(245, 130, 32, 0.05)', borderColor: 'rgba(245,130,32,0.2)' }}>
-                    <span style={{ fontSize: '0.9rem', color: 'var(--accent)' }}>PENDIENTES</span>
-                    <h3 style={{ fontSize: '1.8rem', fontWeight: '800', marginTop: '0.25rem', color: 'var(--accent)' }}>{pendingUsers.length}</h3>
+                  <div className={styles.statsCardPending}>
+                    <span className={styles.statsTitle} style={{ color: 'var(--accent)' }}>Pendientes</span>
+                    <h3 className={styles.statsValue} style={{ color: 'var(--accent)' }}>{pendingUsers.length}</h3>
                   </div>
                 </div>
 
-                <div className="card" style={{ padding: '1.5rem' }}>
-                  <h3 style={{ fontSize: '1.3rem', fontWeight: '800', marginBottom: '1.25rem' }}>Lista de Usuarios Registrados</h3>
-                  <div style={{ overflowX: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                <div className={`card ${styles.leaderboardCard}`}>
+                  <h3 className={styles.cardHeader}>Lista de Usuarios Registrados</h3>
+                  <div className={styles.tableWrapper}>
+                    <table className={styles.table}>
                       <thead>
                         <tr style={{ borderBottom: '2px solid var(--border)' }}>
-                          <th style={{ padding: '0.75rem', color: 'var(--text-muted)' }}>DNI</th>
-                          <th style={{ padding: '0.75rem', color: 'var(--text-muted)' }}>Participante</th>
-                          <th style={{ padding: '0.75rem', color: 'var(--text-muted)' }}>Celular</th>
-                          <th style={{ padding: '0.75rem', color: 'var(--text-muted)', textAlign: 'center' }}>Votos Cargados</th>
-                          <th style={{ padding: '0.75rem', color: 'var(--text-muted)', textAlign: 'center' }}>Estado Pago</th>
-                          <th style={{ padding: '0.75rem', color: 'var(--text-muted)', textAlign: 'right' }}>Acciones</th>
+                          <th className={styles.th}>DNI</th>
+                          <th className={styles.th}>Participante</th>
+                          <th className={styles.th}>Celular</th>
+                          <th className={`${styles.th} hide-mobile`} style={{ textAlign: 'center' }}>Votos Cargados</th>
+                          <th className={`${styles.th} show-mobile`} style={{ textAlign: 'center' }}>Votos</th>
+                          <th className={styles.th} style={{ textAlign: 'center' }}>Estado Pago</th>
+                          <th className={styles.th} style={{ textAlign: 'right' }}>Acciones</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -401,49 +414,34 @@ export default function AdminDashboard() {
                           users
                             .filter(u => u.rol !== 'admin')
                             .map((u) => (
-                              <tr key={u.dni} style={{ borderBottom: '1px solid var(--border)' }}>
-                                <td style={{ padding: '0.75rem', fontWeight: '600' }}>{u.dni}</td>
-                                <td style={{ padding: '0.75rem' }}>{u.nombre} {u.apellido}</td>
-                                <td style={{ padding: '0.75rem' }}>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <tr key={u.dni} className={styles.tr}>
+                                <td className={styles.tdDni}>{u.dni}</td>
+                                <td className={styles.td}>{u.nombre} <span className="hide-mobile">{u.apellido}</span></td>
+                                <td className={styles.td}>
+                                  <div className={styles.phoneWrapper}>
                                     <Smartphone size={14} style={{ color: 'var(--text-muted)' }} />
                                     <span>{u.celular}</span>
                                   </div>
                                 </td>
-                                <td style={{ padding: '0.75rem', textAlign: 'center' }}>
-                                  <span style={{
-                                    padding: '0.2rem 0.5rem',
-                                    borderRadius: '10px',
-                                    fontSize: '0.8rem',
-                                    background: u.predicciones_cargadas > 0 ? 'rgba(19, 184, 96, 0.15)' : 'rgba(255,255,255,0.05)',
-                                    color: u.predicciones_cargadas > 0 ? 'var(--success)' : 'var(--text-muted)'
-                                  }}>
-                                    {u.predicciones_cargadas} partidos
+                                <td className={styles.td} style={{ textAlign: 'center' }}>
+                                  <span className={`${styles.badgePredictions} ${u.predicciones_cargadas > 0 ? styles.badgePredictionsActive : ''}`}>
+                                    {u.predicciones_cargadas} <span className="hide-mobile">partidos</span>
                                   </span>
                                 </td>
-                                <td style={{ padding: '0.75rem', textAlign: 'center' }}>
-                                  <span style={{
-                                    padding: '0.3rem 0.6rem',
-                                    borderRadius: '20px',
-                                    fontSize: '0.85rem',
-                                    fontWeight: '700',
-                                    background: u.pago_aprobado === 1 ? 'rgba(19, 184, 96, 0.15)' : 'rgba(245, 130, 32, 0.15)',
-                                    color: u.pago_aprobado === 1 ? 'var(--success)' : 'var(--accent)',
-                                    border: `1px solid ${u.pago_aprobado === 1 ? 'var(--success)' : 'var(--accent)'}`
-                                  }}>
+                                <td className={styles.td} style={{ textAlign: 'center' }}>
+                                  <span className={`${styles.badgePayment} ${u.pago_aprobado === 1 ? styles.badgePaymentAproved : styles.badgePaymentPending}`}>
                                     {u.pago_aprobado === 1 ? 'Aprobado' : 'Pendiente'}
                                   </span>
                                 </td>
-                                <td style={{ padding: '0.75rem', textAlign: 'right' }}>
-                                  <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                                <td className={styles.td} style={{ textAlign: 'right' }}>
+                                  <div className={styles.actionsWrapper}>
                                     
                                     {/* Link WhatsApp */}
                                     <a
                                       href={getWhatsAppLink(u.celular, u.nombre)}
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      className="btn btn-outline"
-                                      style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', width: 'auto', gap: '4px', color: '#25D366', borderColor: 'rgba(37, 211, 102, 0.2)' }}
+                                      className={`btn btn-outline ${styles.waBtn}`}
                                     >
                                       WhatsApp
                                     </a>
@@ -455,6 +453,14 @@ export default function AdminDashboard() {
                                       style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', width: 'auto', height: 'auto' }}
                                     >
                                       {u.pago_aprobado === 1 ? 'Desaprobar' : 'Aprobar Pago'}
+                                    </button>
+
+                                    {/* Botón Eliminar */}
+                                    <button
+                                      onClick={() => handleDeleteUser(u.dni)}
+                                      className={`btn btn-outline ${styles.deleteBtn}`}
+                                    >
+                                      Eliminar
                                     </button>
 
                                   </div>
@@ -475,15 +481,15 @@ export default function AdminDashboard() {
               <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                 
                 {/* Panel de Sincronización Automática */}
-                <div className="card" style={{ padding: '1.5rem', background: 'rgba(16, 124, 145, 0.05)', borderColor: 'rgba(16, 124, 145, 0.2)' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                <div className={`card ${styles.syncCard}`}>
+                  <div className={styles.syncHeader}>
                     <div>
-                      <h4 style={{ fontSize: '1.2rem', fontWeight: '800', color: 'white' }}>Sincronización de Resultados (API)</h4>
-                      <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '0.25rem' }}>
+                      <h4 className={styles.syncTitle}>Sincronización de Resultados (API)</h4>
+                      <p className={styles.syncDesc}>
                         Conectate a la API oficial del Mundial para traer los resultados de partidos ya finalizados y recalcular los puntos de todos los participantes.
                       </p>
                     </div>
-                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    <div className={styles.syncActions}>
                       <button
                         onClick={() => handleSync(false)}
                         className="btn btn-primary"
@@ -504,13 +510,13 @@ export default function AdminDashboard() {
                   </div>
 
                   {syncResult && (
-                    <div style={{ marginTop: '1rem', padding: '1rem', background: 'rgba(0,0,0,0.25)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)' }}>
-                      <strong style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.95rem', color: 'var(--success)' }}>
+                    <div className={styles.syncReport}>
+                      <strong className={styles.syncReportTitle}>
                         Reporte de Sincronización:
                       </strong>
-                      <p style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>{syncResult.message}</p>
+                      <p className={styles.syncReportText}>{syncResult.message}</p>
                       {syncResult.details && syncResult.details.length > 0 && (
-                        <ul style={{ paddingLeft: '1.25rem', fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>
+                        <ul className={styles.syncReportList}>
                           {syncResult.details.map((detail, idx) => (
                             <li key={idx}>{detail}</li>
                           ))}
@@ -524,85 +530,89 @@ export default function AdminDashboard() {
                   O ingresá los resultados reales de forma manual a continuación. Al guardar, se recalcularán los puntos de todos los usuarios de forma instantánea.
                 </p>
 
-                {matches.length === 0 ? (
-                  <p style={{ textAlign: 'center', color: 'var(--text-muted)' }}>No hay partidos disponibles.</p>
-                ) : (
-                  matches.map((m) => {
-                    const localMatch = localScores[m.id] || { goles_a: '', goles_b: '', estado: 'pendiente' };
-                    const isPlayed = m.estado === 'jugado';
+                <div className={styles.adminMatchList}>
+                  {matches.length === 0 ? (
+                    <p style={{ textAlign: 'center', color: 'var(--text-muted)' }}>No hay partidos disponibles.</p>
+                  ) : (
+                    matches.map((m) => {
+                      const localMatch = localScores[m.id] || { goles_a: '', goles_b: '', estado: 'pendiente' };
+                      const isPlayed = m.estado === 'jugado';
 
-                    return (
-                      <div key={m.id} className="card" style={{ padding: '1.25rem', display: 'grid', gridTemplateColumns: '1.5fr auto 1.5fr', alignItems: 'center', gap: '1rem' }}>
-                        
-                        {/* Detalle fecha/grupo */}
-                        <div style={{ gridColumn: 'span 3', display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-muted)', borderBottom: '1px solid rgba(255,255,255,0.03)', paddingBottom: '0.25rem', marginBottom: '0.25rem' }}>
-                          <span>{m.grupo_fase}</span>
-                          <span>{new Date(m.fecha_hora).toLocaleDateString()}</span>
-                        </div>
-
-                        {/* Equipo A */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'flex-end', fontWeight: '700' }}>
-                          <span>{m.equipo_a}</span>
-                        </div>
-
-                        {/* Cargar Goles */}
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            <input
-                              type="text"
-                              maxLength="2"
-                              className="score-input"
-                              style={{ width: '45px', height: '45px', borderColor: isPlayed ? 'var(--success)' : 'var(--border)' }}
-                              value={localMatch.goles_a}
-                              onChange={(e) => handleScoreChange(m.id, 'a', e.target.value)}
-                              placeholder="-"
-                            />
-                            <span style={{ fontWeight: '800', color: 'var(--text-muted)' }}>VS</span>
-                            <input
-                              type="text"
-                              maxLength="2"
-                              className="score-input"
-                              style={{ width: '45px', height: '45px', borderColor: isPlayed ? 'var(--success)' : 'var(--border)' }}
-                              value={localMatch.goles_b}
-                              onChange={(e) => handleScoreChange(m.id, 'b', e.target.value)}
-                              placeholder="-"
-                            />
+                      return (
+                        <div key={m.id} className={`card ${styles.matchCard}`}>
+                          
+                          {/* Detalle fecha/grupo */}
+                          <div className={styles.matchHeader}>
+                            <span>{m.grupo_fase}</span>
+                            <span>{new Date(m.fecha_hora).toLocaleDateString()}</span>
                           </div>
 
-                          <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.25rem' }}>
-                            {/* Botón Guardar */}
-                            <button
-                              onClick={() => handleSaveResult(m.id)}
-                              className="btn btn-accent"
-                              style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem', width: 'auto', gap: '4px' }}
-                            >
-                              <Save size={12} />
-                              Guardar
-                            </button>
+                          <div className={styles.matchBody}>
+                            {/* Equipo A */}
+                            <div className={styles.teamRowA}>
+                              <span>{m.equipo_a}</span>
+                            </div>
 
-                            {/* Botón Resetear si ya se jugó */}
-                            {isPlayed && (
-                              <button
-                                onClick={() => handleResetMatch(m.id)}
-                                className="btn btn-outline"
-                                style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem', width: 'auto', gap: '4px', borderColor: 'var(--danger)', color: '#ff7a7a' }}
-                              >
-                                <Trash2 size={12} />
-                                Resetear
-                              </button>
-                            )}
+                            {/* Cargar Goles */}
+                            <div className={styles.scoreControl}>
+                              <div className={styles.scoreInputsRow}>
+                                <input
+                                  type="text"
+                                  maxLength="2"
+                                  className="score-input"
+                                  style={{ width: '45px', height: '45px', borderColor: isPlayed ? 'var(--success)' : 'var(--border)' }}
+                                  value={localMatch.goles_a}
+                                  onChange={(e) => handleScoreChange(m.id, 'a', e.target.value)}
+                                  placeholder="-"
+                                />
+                                <span className={styles.vsDivider}>VS</span>
+                                <input
+                                  type="text"
+                                  maxLength="2"
+                                  className="score-input"
+                                  style={{ width: '45px', height: '45px', borderColor: isPlayed ? 'var(--success)' : 'var(--border)' }}
+                                  value={localMatch.goles_b}
+                                  onChange={(e) => handleScoreChange(m.id, 'b', e.target.value)}
+                                  placeholder="-"
+                                />
+                              </div>
+
+                              <div className={styles.adminActionsRow}>
+                                {/* Botón Guardar */}
+                                <button
+                                  onClick={() => handleSaveResult(m.id)}
+                                  className="btn btn-accent"
+                                  style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem', width: 'auto', gap: '4px', height: 'auto' }}
+                                >
+                                  <Save size={12} />
+                                  Guardar
+                                </button>
+
+                                {/* Botón Resetear si ya se jugó */}
+                                {isPlayed && (
+                                  <button
+                                    onClick={() => handleResetMatch(m.id)}
+                                    className="btn btn-outline"
+                                    style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem', width: 'auto', gap: '4px', borderColor: 'var(--danger)', color: '#ff7a7a', height: 'auto' }}
+                                  >
+                                    <Trash2 size={12} />
+                                    Resetear
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Equipo B */}
+                            <div className={styles.teamRowB}>
+                              <span>{m.equipo_b}</span>
+                            </div>
                           </div>
-                        </div>
 
-                        {/* Equipo B */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'flex-start', fontWeight: '700' }}>
-                          <span>{m.equipo_b}</span>
                         </div>
-
-                      </div>
-                    );
-                  })
-                )}
+                      );
+                    })
+                  )}
+                </div>
               </div>
             )}
           </>

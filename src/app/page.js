@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Trophy, LogIn, UserPlus, CreditCard, Phone, User, ShieldAlert } from 'lucide-react';
+import styles from './page.module.css';
 
 export default function AccessPage() {
   const router = useRouter();
@@ -53,7 +54,7 @@ export default function AccessPage() {
       }
 
       setMessage({ type: 'success', text: '¡Registro exitoso! Iniciando sesión...' });
-      
+
       // Guardar sesión y redirigir
       localStorage.setItem('chimiUser', JSON.stringify(data.user));
       setTimeout(() => {
@@ -90,7 +91,7 @@ export default function AccessPage() {
       }
 
       setMessage({ type: 'success', text: '¡Ingreso correcto! Redirigiendo...' });
-      
+
       // Guardar sesión y redirigir
       localStorage.setItem('chimiUser', JSON.stringify(data.user));
       setTimeout(() => {
@@ -105,157 +106,86 @@ export default function AccessPage() {
   };
 
   return (
-    <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', paddingBottom: '3rem' }}>
-      
-      {/* Decoración superior estética fútbol + pesca */}
-      <div style={{
-        background: 'linear-gradient(90deg, #107c91 0%, #13b860 50%, #f58220 100%)',
-        height: '6px',
-        width: '100%'
-      }}></div>
+    <main className={styles.mainPage}>
 
-      <div className="container" style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', marginTop: '1rem' }}>
-        
+      {/* Decoración superior estética fútbol + pesca */}
+      <div className={styles.topDecorator}></div>
+
+      <div className={`container ${styles.pageContainer}`}>
+
         {/* Encabezado Principal */}
-        <header style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1.2rem', marginBottom: '0.8rem' }}>
-            <img 
-              src="/chimipesca-logo.jpg" 
-              alt="ChimiPesca Logo" 
-              style={{
-                width: '90px',
-                height: '90px',
-                borderRadius: '50%',
-                border: '3px solid var(--accent)',
-                boxShadow: '0 0 20px var(--accent-glow)',
-                objectFit: 'cover'
-              }}
+        <header className={styles.header}>
+          <div className={styles.brandContainer}>
+            <img
+              src="/chimipesca-logo.jpg"
+              alt="ChimiPesca Logo"
+              className={styles.logoChimi}
             />
-            <h1 style={{
-              fontSize: '2.5rem',
-              fontWeight: '800',
-              lineHeight: '1.1',
-              textAlign: 'left',
-              maxWidth: '350px',
-              background: 'linear-gradient(to right, #fff, #b7e3ed)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              textShadow: '0 2px 10px rgba(0,0,0,0.5)'
-            }}>
-              Chimi Prode <span style={{ color: 'var(--accent)' }}>Mundial 2026</span>
+            <h1 className={styles.mainTitle}>
+              Chimi Prode <span className={styles.titleAccent}>Mundial 2026</span>
             </h1>
+            <img
+              src="/mundial-logo.jpg"
+              alt="Mundial 2026 Logo"
+              className={styles.logoMundial}
+            />
           </div>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '1.2rem', fontWeight: '400', maxWidth: '500px', margin: '0 auto' }}>
-            El prode de la comunidad del canal <span style={{ color: 'var(--success)', fontWeight: '600' }}>ChimiPesca</span>. ¡Pesca, fútbol y mucha pasión!
+          <p className={styles.subtitle}>
+            El prode de la comunidad del canal <span className={styles.subtitleHighlight}>ChimiPesca</span>. ¡Pesca, fútbol y mucha pasión!
           </p>
         </header>
 
         {/* Banner de Pago / Datos Bancarios */}
-        <section className="card animate-fade-in" style={{ padding: '1.5rem', marginBottom: '2rem', borderLeft: '5px solid var(--accent)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
-            <CreditCard style={{ color: 'var(--accent)', width: '32px', height: '32px' }} />
-            <h2 style={{ fontSize: '1.3rem', fontWeight: '700', color: 'white' }}>Instrucciones de Inscripción</h2>
+        <section className={`card animate-fade-in ${styles.infoSection}`}>
+          <div className={styles.infoTitleRow}>
+            <CreditCard className={styles.infoIcon} />
+            <h2 className={styles.infoTitle}>Instrucciones de Inscripción</h2>
           </div>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem', marginBottom: '0.75rem' }}>
+          <p className={styles.infoDesc}>
             Para participar del prode y competir en el ranking de premios, transferí el valor de la inscripción:
           </p>
-          <div style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '1rem',
-            background: 'rgba(0,0,0,0.25)',
-            padding: '1rem',
-            borderRadius: 'var(--radius-md)',
-            justifyContent: 'space-around',
-            alignItems: 'center'
-          }}>
-            <div>
-              <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'block', textTransform: 'uppercase' }}>Valor</span>
-              <span style={{ fontSize: '1.4rem', fontWeight: '800', color: 'var(--success)' }}>$5.000 ARS</span>
+          <div className={styles.paymentRow}>
+            <div className={styles.paymentCol}>
+              <span className={styles.paymentLabel}>Valor</span>
+              <span className={styles.paymentValue}>$10.000 ARS</span>
             </div>
-            <div style={{ borderLeft: '1px solid var(--border)', height: '40px' }} className="hide-mobile"></div>
-            <div>
-              <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'block', textTransform: 'uppercase' }}>Alias Mercado Pago</span>
-              <span style={{ fontSize: '1.3rem', fontWeight: '800', color: 'white', letterSpacing: '0.05em' }}>lodechimipesca</span>
+            <div className={`${styles.paymentDivider} hide-mobile`}></div>
+            <div className={styles.paymentCol}>
+              <span className={styles.paymentLabel}>Alias Mercado Pago</span>
+              <span className={styles.paymentAlias}>chimipesca.mundial</span>
             </div>
           </div>
-          <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginTop: '0.75rem', textAlign: 'center', fontStyle: 'italic' }}>
+          <p className={styles.paymentFooter}>
             Una vez transferido, registrate abajo con tus datos. El administrador aprobará tu participación.
           </p>
         </section>
 
         {/* Caja de Formularios (Tab Switcher) */}
-        <section className="card animate-fade-in" style={{ animationDelay: '0.1s' }}>
-          
+        <section className={`card animate-fade-in ${styles.formCard}`}>
+
           {/* Selector de Pestañas */}
-          <div style={{
-            display: 'flex',
-            background: 'rgba(0, 0, 0, 0.3)',
-            borderRadius: 'var(--radius-md)',
-            padding: '0.4rem',
-            marginBottom: '2rem'
-          }}>
+          <div className={styles.tabsContainer}>
             <button
               onClick={() => { setActiveTab('register'); setMessage({ type: '', text: '' }); }}
-              style={{
-                flex: 1,
-                padding: '0.8rem',
-                border: 'none',
-                borderRadius: 'calc(var(--radius-md) - 4px)',
-                cursor: 'pointer',
-                fontWeight: '700',
-                fontSize: '1.05rem',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.5rem',
-                transition: 'var(--transition)',
-                background: activeTab === 'register' ? 'var(--primary)' : 'transparent',
-                color: activeTab === 'register' ? 'white' : 'var(--text-secondary)'
-              }}
+              className={`${styles.tabButton} ${activeTab === 'register' ? styles.tabButtonActive : ''}`}
             >
               <UserPlus size={18} />
-              1. REGISTRARSE
+              <span className="hide-mobile">1. REGISTRARSE</span>
+              <span className="show-mobile">REGISTRARSE</span>
             </button>
             <button
               onClick={() => { setActiveTab('login'); setMessage({ type: '', text: '' }); }}
-              style={{
-                flex: 1,
-                padding: '0.8rem',
-                border: 'none',
-                borderRadius: 'calc(var(--radius-md) - 4px)',
-                cursor: 'pointer',
-                fontWeight: '700',
-                fontSize: '1.05rem',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.5rem',
-                transition: 'var(--transition)',
-                background: activeTab === 'login' ? 'var(--primary)' : 'transparent',
-                color: activeTab === 'login' ? 'white' : 'var(--text-secondary)'
-              }}
+              className={`${styles.tabButton} ${activeTab === 'login' ? styles.tabButtonActive : ''}`}
             >
               <LogIn size={18} />
-              2. YA ESTOY REGISTRADO
+              <span className="hide-mobile">2. YA ESTOY REGISTRADO</span>
+              <span className="show-mobile">INGRESAR</span>
             </button>
           </div>
 
           {/* Mostrar Mensajes */}
           {message.text && (
-            <div style={{
-              padding: '1rem',
-              borderRadius: 'var(--radius-md)',
-              marginBottom: '1.5rem',
-              fontWeight: '500',
-              fontSize: '1.05rem',
-              background: message.type === 'success' ? 'rgba(19, 184, 96, 0.15)' : 'rgba(231, 76, 60, 0.15)',
-              border: `1px solid ${message.type === 'success' ? 'var(--success)' : 'var(--danger)'}`,
-              color: message.type === 'success' ? '#a3f3c8' : '#ff9c9c',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.8rem'
-            }}>
+            <div className={`${styles.messageBox} ${message.type === 'success' ? styles.messageBoxSuccess : styles.messageBoxDanger}`}>
               <span>{message.type === 'success' ? '🏆' : '⚠️'}</span>
               <span>{message.text}</span>
             </div>
@@ -264,10 +194,10 @@ export default function AccessPage() {
           {/* Formulario de Registro */}
           {activeTab === 'register' && (
             <form onSubmit={handleRegister}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }} className="grid-mobile">
+              <div className={styles.gridMobile}>
                 <div className="form-group">
                   <label className="form-label" htmlFor="nombre">
-                    <User size={14} style={{ marginRight: '4px', verticalAlign: 'middle' }} /> Nombre
+                    <User size={14} className={styles.iconInline} /> Nombre
                   </label>
                   <input
                     type="text"
@@ -308,7 +238,7 @@ export default function AccessPage() {
 
               <div className="form-group">
                 <label className="form-label" htmlFor="celular">
-                  <Phone size={14} style={{ marginRight: '4px', verticalAlign: 'middle' }} /> Teléfono Celular (Para contactarte)
+                  <Phone size={14} className={styles.iconInline} /> Teléfono Celular (Para contactarte)
                 </label>
                 <input
                   type="tel"
@@ -365,26 +295,6 @@ export default function AccessPage() {
         </section>
 
       </div>
-
-      <style jsx>{`
-        .grid-mobile {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 1rem;
-        }
-        .hide-mobile {
-          display: block;
-        }
-        @media (max-width: 600px) {
-          .grid-mobile {
-            grid-template-columns: 1fr;
-            gap: 0;
-          }
-          .hide-mobile {
-            display: none;
-          }
-        }
-      `}</style>
     </main>
   );
 }

@@ -1,0 +1,372 @@
+.dashboardContainer {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-main);
+}
+
+.logoNavMundial {
+  background-color: black;
+}
+
+.navUserSection {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.navUserText {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.navUserAccent {
+  color: var(--accent);
+}
+
+.navLogoutBtn {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  border-radius: var(--radius-sm);
+  width: auto;
+}
+
+.mainContent {
+  flex-grow: 1;
+  padding-top: 1.5rem;
+  padding-bottom: 8rem; /* Padding extra para que el botón flotante no tape contenido */
+}
+
+.tabSelector {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2rem;
+  gap: 1rem;
+}
+
+.tabButton {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  padding: 1rem 0.5rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-bottom: 3px solid transparent;
+}
+
+.tabButtonActive {
+  border-bottom: 3px solid var(--accent);
+  color: white;
+}
+
+.loadingContainer {
+  text-align: center;
+  padding: 4rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.loadingSpinner {
+  color: var(--accent);
+  animation: spin 1s linear infinite;
+}
+
+.predictionsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.predictionsDesc {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+.matchesList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-bottom: 3rem;
+}
+
+.emptyMatches {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 2rem;
+}
+
+.saveButtonContainer {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 3rem);
+  max-width: 500px;
+  zIndex: 90;
+}
+
+.saveButton {
+  font-size: 1.2rem;
+  gap: 0.75rem;
+  height: 3.5rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+}
+
+.leaderboardCard {
+  padding: 1.5rem;
+}
+
+.leaderboardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.leaderboardTitle {
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.searchContainer {
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+}
+
+.searchInput {
+  padding-left: 2.5rem;
+  font-size: 0.95rem;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.th {
+  padding: 1rem 0.5rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.tr {
+  border-bottom: 1px solid var(--border);
+  transition: var(--transition);
+}
+
+.trUser {
+  background: rgba(245, 130, 32, 0.08);
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.td {
+  padding: 1rem 0.5rem;
+}
+
+.tdPoints {
+  padding: 1rem 0.5rem;
+  text-align: center;
+  font-weight: 600;
+}
+
+.tdTotal {
+  padding: 1rem 0.5rem;
+  text-align: right;
+  font-weight: 800;
+  font-size: 1.15rem;
+}
+
+.regulationsSection {
+  margin-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+}
+
+.regulationsTitle {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.regulationsList {
+  padding-left: 1.25rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Estructura responsiva de la Tarjeta de Partido */
+.matchBody {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex: 1;
+  width: 100%;
+}
+
+.teamRowA {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.8rem;
+  flex: 1;
+}
+
+.teamRowB {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.8rem;
+  flex: 1;
+}
+
+.teamRowB .scoreInput {
+  order: 1;
+}
+
+.teamRowB .teamInfo {
+  order: 2;
+}
+
+.vsDivider {
+  font-weight: 800;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.teamInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.teamName {
+  font-weight: 600;
+  font-size: 1.15rem;
+}
+
+.flag {
+  font-size: 2.2rem;
+  line-height: 1;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 600px) {
+  .navUserText {
+    font-size: 0.9rem;
+  }
+
+  .mainContent {
+    padding-top: 1rem;
+    padding-bottom: 7rem;
+  }
+
+  .tabButton {
+    font-size: 0.95rem;
+    padding: 0.8rem 0.2rem;
+  }
+
+  .predictionsDesc {
+    font-size: 0.95rem;
+  }
+
+  .saveButtonContainer {
+    bottom: 1.5rem;
+    width: calc(100% - 2rem);
+  }
+
+  .saveButton {
+    font-size: 1rem;
+    height: 3rem;
+  }
+
+  .leaderboardCard {
+    padding: 1rem;
+  }
+
+  .leaderboardTitle {
+    font-size: 1.25rem;
+  }
+
+  .searchContainer {
+    max-width: 100%;
+  }
+
+  .th, .td {
+    padding: 0.6rem 0.3rem;
+    font-size: 0.85rem;
+  }
+
+  .tdTotal {
+    font-size: 0.95rem;
+  }
+
+  .matchBody {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .teamRowA, .teamRowB {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .teamRowB .scoreInput {
+    order: 2;
+  }
+
+  .teamRowB .teamInfo {
+    order: 1;
+  }
+
+  .vsDivider {
+    display: none;
+  }
+
+  .teamName {
+    font-size: 0.95rem;
+  }
+
+  .flag {
+    font-size: 1.75rem;
+  }
+}

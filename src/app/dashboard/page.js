@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Trophy, Calendar, CheckCircle2, Lock, Save, LogOut, Search, RefreshCw, AlertCircle } from 'lucide-react';
+import styles from './dashboard.module.css';
 
 // Mapeo de banderas de países
 const FLAGS = {
@@ -179,21 +180,22 @@ export default function Dashboard() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-main)' }}>
+    <div className={styles.dashboardContainer}>
       
       {/* Barra de Navegación */}
       <nav className="navbar">
         <div className="nav-brand">
           <img src="/chimipesca-logo.jpg" alt="Logo ChimiPesca" className="nav-logo" />
+          <img src="/mundial-logo.jpg" alt="Logo Mundial 2026" className={`nav-logo ${styles.logoNavMundial}`} />
           <span className="nav-title hide-mobile">Chimi Prode 2026</span>
         </div>
         
         {user && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
-            <span style={{ fontSize: '1.05rem', fontWeight: '600', color: 'var(--text-primary)' }}>
-              👋 Hola, <span style={{ color: 'var(--accent)' }}>{user.nombre} {user.apellido}</span>
+          <div className={styles.navUserSection}>
+            <span className={styles.navUserText}>
+              👋 Hola, <span className={styles.navUserAccent}>{user.nombre}</span> <span className="hide-mobile">{user.apellido}</span>
             </span>
-            <button onClick={handleLogout} className="btn btn-outline" style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', borderRadius: 'var(--radius-sm)', width: 'auto' }}>
+            <button onClick={handleLogout} className={`btn btn-outline ${styles.navLogoutBtn}`}>
               <LogOut size={16} /> <span className="hide-mobile">Salir</span>
             </button>
           </div>
@@ -201,7 +203,7 @@ export default function Dashboard() {
       </nav>
 
       {/* Contenido Principal */}
-      <main className="container" style={{ flexGrow: 1, paddingTop: '1.5rem', paddingBottom: '5rem' }}>
+      <main className={`container ${styles.mainContent}`}>
         
         {/* Banner de alerta de pago pendiente */}
         {user && user.pago_aprobado === 0 && (
@@ -238,33 +240,14 @@ export default function Dashboard() {
         )}
 
         {/* Tab Selector */}
-        <div style={{
-          display: 'flex',
-          borderBottom: '1px solid var(--border)',
-          marginBottom: '2rem',
-          gap: '1rem'
-        }}>
+        <div className={styles.tabSelector}>
           <button
             onClick={() => setActiveTab('predictions')}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              borderBottom: activeTab === 'predictions' ? '3px solid var(--accent)' : '3px solid transparent',
-              color: activeTab === 'predictions' ? 'white' : 'var(--text-secondary)',
-              padding: '1rem 0.5rem',
-              fontSize: '1.2rem',
-              fontWeight: '700',
-              cursor: 'pointer',
-              transition: 'var(--transition)',
-              flex: 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.5rem'
-            }}
+            className={`${styles.tabButton} ${activeTab === 'predictions' ? styles.tabButtonActive : ''}`}
           >
             <Calendar size={20} />
-            Mis Pronósticos
+            <span className="hide-mobile">Mis Pronósticos</span>
+            <span className="show-mobile">Mis Votos</span>
           </button>
           
           <button
@@ -272,32 +255,18 @@ export default function Dashboard() {
               setActiveTab('leaderboard');
               if (user) fetchData(user.dni); // Recargar datos
             }}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              borderBottom: activeTab === 'leaderboard' ? '3px solid var(--accent)' : '3px solid transparent',
-              color: activeTab === 'leaderboard' ? 'white' : 'var(--text-secondary)',
-              padding: '1rem 0.5rem',
-              fontSize: '1.2rem',
-              fontWeight: '700',
-              cursor: 'pointer',
-              transition: 'var(--transition)',
-              flex: 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.5rem'
-            }}
+            className={`${styles.tabButton} ${activeTab === 'leaderboard' ? styles.tabButtonActive : ''}`}
           >
             <Trophy size={20} />
-            Tabla de Posiciones
+            <span className="hide-mobile">Tabla de Posiciones</span>
+            <span className="show-mobile">Posiciones</span>
           </button>
         </div>
 
         {/* Carga del Dashboard */}
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '4rem 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-            <RefreshCw className="animate-spin" style={{ color: 'var(--accent)', animation: 'spin 1s linear infinite' }} size={40} />
+          <div className={styles.loadingContainer}>
+            <RefreshCw className={styles.loadingSpinner} size={40} />
             <p style={{ color: 'var(--text-secondary)' }}>Cargando datos del Prode...</p>
           </div>
         ) : (
@@ -305,16 +274,16 @@ export default function Dashboard() {
             {/* Pestaña: Mis Pronósticos */}
             {activeTab === 'predictions' && (
               <div className="animate-fade-in">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                  <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>
+                <div className={styles.predictionsHeader}>
+                  <p className={styles.predictionsDesc}>
                     Ingresá tus resultados estimados. Podés editarlos las veces que quieras hasta que comience cada partido.
                   </p>
                 </div>
 
                 {/* Lista de Partidos */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginBottom: '3rem' }}>
+                <div className={styles.matchesList}>
                   {matches.length === 0 ? (
-                    <p style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '2rem' }}>No hay partidos cargados actualmente.</p>
+                    <p className={styles.emptyMatches}>No hay partidos cargados actualmente.</p>
                   ) : (
                     matches.map((match) => {
                       const closed = isMatchClosed(match.fecha_hora) || match.estado === 'jugado';
@@ -328,15 +297,13 @@ export default function Dashboard() {
                             <span>{formatMatchDate(match.fecha_hora)}</span>
                           </div>
 
-                          {/* Equipo A */}
-                          <div className="match-team team-a">
-                            <span>{match.equipo_a}</span>
-                            <span className="match-flag">{FLAGS[match.equipo_a] || '🏳️'}</span>
-                          </div>
-
-                          {/* Inputs de Predicción */}
-                          <div className="match-vs">
-                            <div className="match-score-inputs">
+                          <div className={styles.matchBody}>
+                            {/* Equipo A Row */}
+                            <div className={styles.teamRowA}>
+                              <div className={styles.teamInfo}>
+                                <span className={styles.teamName}>{match.equipo_a}</span>
+                                <span className={styles.flag}>{FLAGS[match.equipo_a] || '🏳️'}</span>
+                              </div>
                               <input
                                 type="text"
                                 maxLength="2"
@@ -347,36 +314,54 @@ export default function Dashboard() {
                                 disabled={closed}
                                 placeholder="-"
                               />
+                            </div>
+
+                            {/* VS Divider & Closed Status */}
+                            <div className={styles.vsDivider}>
                               <span style={{ fontWeight: '800', color: 'var(--text-muted)' }}>VS</span>
+                              {closed ? (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', color: 'var(--accent)', marginTop: '4px', fontWeight: '600' }}>
+                                  <Lock size={12} />
+                                  Cerrado
+                                </div>
+                              ) : (
+                                <div style={{ fontSize: '0.8rem', color: 'var(--success)', marginTop: '4px', fontWeight: '500' }}>
+                                  Votar
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Equipo B Row */}
+                            <div className={styles.teamRowB}>
                               <input
                                 type="text"
                                 maxLength="2"
                                 inputMode="numeric"
-                                className="score-input"
+                                className={`score-input ${styles.scoreInput}`}
                                 value={match.goles_pred_b}
                                 onChange={(e) => handleScoreChange(match.id, 'b', e.target.value)}
                                 disabled={closed}
                                 placeholder="-"
                               />
+                              <div className={styles.teamInfo}>
+                                <span className={styles.flag}>{FLAGS[match.equipo_b] || '🏳️'}</span>
+                                <span className={styles.teamName}>{match.equipo_b}</span>
+                              </div>
                             </div>
-                            
-                            {/* Estado y Candados */}
+                          </div>
+
+                          {/* Status only on mobile (since vsDivider is hidden on mobile) */}
+                          <div className="show-mobile" style={{ textAlign: 'center', width: '100%', marginTop: '0.25rem' }}>
                             {closed ? (
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', color: 'var(--accent)', marginTop: '4px', fontWeight: '600' }}>
+                              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', color: 'var(--accent)', fontWeight: '600' }}>
                                 <Lock size={12} />
                                 Cerrado
                               </div>
                             ) : (
-                              <div style={{ fontSize: '0.8rem', color: 'var(--success)', marginTop: '4px', fontWeight: '500' }}>
+                              <div style={{ fontSize: '0.8rem', color: 'var(--success)', fontWeight: '500' }}>
                                 Abierto para votar
                               </div>
                             )}
-                          </div>
-
-                          {/* Equipo B */}
-                          <div className="match-team team-b">
-                            <span className="match-flag">{FLAGS[match.equipo_b] || '🏳️'}</span>
-                            <span>{match.equipo_b}</span>
                           </div>
 
                           {/* Resultados Reales y Puntuación Obtenida */}
@@ -413,19 +398,10 @@ export default function Dashboard() {
                 </div>
 
                 {/* Botón flotante para guardar predicciones */}
-                <div style={{
-                  position: 'fixed',
-                  bottom: '2rem',
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  width: 'calc(100% - 3rem)',
-                  maxWidth: '500px',
-                  zIndex: 90
-                }}>
+                <div className={styles.saveButtonContainer}>
                   <button
                     onClick={handleSavePredictions}
-                    className="btn btn-accent"
-                    style={{ fontSize: '1.2rem', gap: '0.75rem', height: '3.5rem', boxShadow: '0 8px 30px rgba(0,0,0,0.6)' }}
+                    className={`btn btn-accent ${styles.saveButton}`}
                     disabled={saving}
                   >
                     <Save size={22} />
@@ -437,35 +413,36 @@ export default function Dashboard() {
 
             {/* Pestaña: Tabla de Posiciones */}
             {activeTab === 'leaderboard' && (
-              <div className="card animate-fade-in" style={{ padding: '1.5rem' }}>
+              <div className={`card animate-fade-in ${styles.leaderboardCard}`}>
                 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
-                  <h2 style={{ fontSize: '1.5rem', fontWeight: '800' }}>Competencia Oficial</h2>
+                <div className={styles.leaderboardHeader}>
+                  <h2 className={styles.leaderboardTitle}>Competencia Oficial</h2>
                   
                   {/* Buscador de Participante */}
-                  <div style={{ position: 'relative', width: '100%', maxWidth: '300px' }}>
-                    <Search style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} size={18} />
+                  <div className={styles.searchContainer}>
+                    <Search className={styles.searchIcon} size={18} />
                     <input
                       type="text"
-                      className="form-input"
+                      className={`form-input ${styles.searchInput}`}
                       placeholder="Buscar participante..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      style={{ paddingLeft: '2.5rem', fontSize: '0.95rem' }}
                     />
                   </div>
                 </div>
 
                 {/* Tabla de Ranking */}
-                <div style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                <div className={styles.tableWrapper}>
+                  <table className={styles.table}>
                     <thead>
                       <tr style={{ borderBottom: '2px solid var(--border)' }}>
-                        <th style={{ padding: '1rem 0.5rem', color: 'var(--text-muted)', fontWeight: '600' }}>Puesto</th>
-                        <th style={{ padding: '1rem 0.5rem', color: 'var(--text-muted)', fontWeight: '600' }}>Participante</th>
-                        <th style={{ padding: '1rem 0.5rem', color: 'var(--text-muted)', fontWeight: '600', textAlign: 'center' }}>Plenos (3 pts)</th>
-                        <th style={{ padding: '1rem 0.5rem', color: 'var(--text-muted)', fontWeight: '600', textAlign: 'center' }}>Aciertos (1 pt)</th>
-                        <th style={{ padding: '1rem 0.5rem', color: 'var(--text-muted)', fontWeight: '600', textAlign: 'right' }}>Total Puntos</th>
+                        <th className={styles.th}>Puesto</th>
+                        <th className={styles.th}>Participante</th>
+                        <th className={`${styles.th} hide-mobile`}>Plenos (3 pts)</th>
+                        <th className={`${styles.th} show-mobile`}>Plenos</th>
+                        <th className={`${styles.th} hide-mobile`}>Aciertos (1 pt)</th>
+                        <th className={`${styles.th} show-mobile`}>Aciertos</th>
+                        <th className={styles.th} style={{ textAlign: 'right' }}>Total Puntos</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -482,26 +459,21 @@ export default function Dashboard() {
                           return (
                             <tr
                               key={entry.dni}
-                              style={{
-                                borderBottom: '1px solid var(--border)',
-                                background: isCurrentUser ? 'rgba(245, 130, 32, 0.08)' : 'transparent',
-                                fontWeight: isCurrentUser ? '700' : '400',
-                                color: isCurrentUser ? 'var(--accent)' : 'white'
-                              }}
+                              className={`${styles.tr} ${isCurrentUser ? styles.trUser : ''}`}
                             >
-                              <td style={{ padding: '1rem 0.5rem' }}>
+                              <td className={styles.td}>
                                 {index + 1 === 1 ? '🥇' : index + 1 === 2 ? '🥈' : index + 1 === 3 ? '🥉' : `#${index + 1}`}
                               </td>
-                              <td style={{ padding: '1rem 0.5rem' }}>
-                                {entry.nombre} {entry.apellido} {isCurrentUser && ' (Vos)'}
+                              <td className={styles.td}>
+                                {entry.nombre} <span className="hide-mobile">{entry.apellido}</span> {isCurrentUser && ' (Vos)'}
                               </td>
-                              <td style={{ padding: '1rem 0.5rem', textAlign: 'center', color: 'var(--success)' }}>
+                              <td className={styles.tdPoints} style={{ color: 'var(--success)' }}>
                                 {entry.exactos}
                               </td>
-                              <td style={{ padding: '1rem 0.5rem', textAlign: 'center', color: '#4dc2db' }}>
+                              <td className={styles.tdPoints} style={{ color: '#4dc2db' }}>
                                 {entry.aciertos}
                               </td>
-                              <td style={{ padding: '1rem 0.5rem', textAlign: 'right', fontWeight: '800', fontSize: '1.15rem' }}>
+                              <td className={styles.tdTotal}>
                                 {entry.puntos_totales} pts
                               </td>
                             </tr>
@@ -512,9 +484,9 @@ export default function Dashboard() {
                   </table>
                 </div>
 
-                <div style={{ marginTop: '1.5rem', borderTop: '1px solid var(--border)', paddingTop: '1rem' }}>
-                  <h4 style={{ fontSize: '0.9rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Reglamento de Puntos:</h4>
-                  <ul style={{ paddingLeft: '1.25rem', fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <div className={styles.regulationsSection}>
+                  <h4 className={styles.regulationsTitle}>Reglamento de Puntos:</h4>
+                  <ul className={styles.regulationsList}>
                     <li><strong>Resultado Exacto (3 Puntos)</strong>: Acertar goles de ambos equipos exactamente (ej. pronóstico 2-1 y real 2-1).</li>
                     <li><strong>Resultado Solo (1 Punto)</strong>: Acertar el ganador o empate sin el resultado exacto (ej. pronóstico 2-1 y real 1-0; o pronóstico 1-1 y real 2-2).</li>
                     <li><strong>Desempate</strong>: En caso de empate en puntos totales, el ranking se ordena por el participante que tenga mayor cantidad de resultados exactos (plenos).</li>
@@ -527,21 +499,6 @@ export default function Dashboard() {
         )}
 
       </main>
-
-      <style jsx global>{`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        .animate-spin {
-          animation: spin 1s linear infinite;
-        }
-        @media (max-width: 600px) {
-          .hide-mobile {
-            display: none !important;
-          }
-        }
-      `}</style>
     </div>
   );
 }

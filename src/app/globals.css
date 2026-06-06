@@ -410,3 +410,47 @@ html, body {
   border: 1px solid var(--danger);
   color: var(--danger);
 }
+
+/* Utilidades responsivas de visualización */
+.show-mobile {
+  display: none !important;
+}
+
+@media (max-width: 600px) {
+  .show-mobile {
+    display: block !important;
+  }
+  th.show-mobile, td.show-mobile {
+    display: table-cell !important;
+  }
+  .hide-mobile {
+    display: none !important;
+  }
+  
+  /* Ajustes globales de fuentes y espaciados para mobile */
+  .container {
+    padding: 1rem;
+  }
+  
+  .btn {
+    font-size: 1rem;
+    padding: 0.75rem 1.25rem;
+  }
+  
+  .card {
+    padding: 1.25rem;
+    border-radius: var(--radius-md);
+  }
+  
+  .form-input {
+    font-size: 1rem;
+    padding: 0.75rem 1rem;
+  }
+  
+  /* Ajustes en Inputs de goles */
+  .score-input {
+    width: 44px;
+    height: 44px;
+    font-size: 1.25rem;
+  }
+}

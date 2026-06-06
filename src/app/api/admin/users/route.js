@@ -67,3 +67,32 @@ export async function POST(request) {
     return Response.json({ error: 'Error en el servidor.' }, { status: 500 });
   }
 }
+
+export async function DELETE(request) {
+  if (!isAuthorized(request)) {
+    return Response.json({ error: 'No autorizado.' }, { status: 401 });
+  }
+
+  try {
+    const { searchParams } = new URL(request.url);
+    const dni = searchParams.get('dni');
+
+    if (!dni) {
+      return Response.json({ error: 'DNI requerido.' }, { status: 400 });
+    }
+
+    const result = await db.execute({
+      sql: 'DELETE FROM users WHERE dni = ?',
+      args: [dni]
+    });
+
+    if (result.rowsAffected === 0) {
+      return Response.json({ error: 'Usuario no encontrado.' }, { status: 404 });
+    }
+
+    return Response.json({ success: true, message: 'Usuario eliminado exitosamente.' });
+  } catch (error) {
+    console.error('Error en admin users DELETE:', error);
+    return Response.json({ error: 'Error en el servidor.' }, { status: 500 });
+  }
+}

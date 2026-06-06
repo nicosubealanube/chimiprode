@@ -1,142 +1,297 @@
-.page {
-  --background: #fafafa;
-  --foreground: #fff;
-
-  --text-primary: #000;
-  --text-secondary: #666;
-
-  --button-primary-hover: #383838;
-  --button-secondary-hover: #f2f2f2;
-  --button-secondary-border: #ebebeb;
-
+.mainPage {
+  min-height: 100vh;
   display: flex;
-  flex: 1;
   flex-direction: column;
+  padding-bottom: 3rem;
+}
+
+.topDecorator {
+  background: linear-gradient(90deg, #107c91 0%, #13b860 50%, #f58220 100%);
+  height: 6px;
+  width: 100%;
+}
+
+.pageContainer {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.brandContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.logoChimi {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  border: 3px solid var(--accent);
+  box-shadow: 0 0 20px var(--accent-glow);
+  object-fit: cover;
+}
+
+.logoMundial {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  border: 3px solid var(--accent);
+  box-shadow: 0 0 20px var(--accent-glow);
+  object-fit: cover;
+  background-color: black;
+}
+
+.mainTitle {
+  font-size: 2.5rem;
+  font-weight: 800;
+  line-height: 1.1;
+  text-align: center;
+  max-width: 380px;
+  background: linear-gradient(to right, #fff, #b7e3ed);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.titleAccent {
+  color: var(--accent);
+  -webkit-text-fill-color: initial;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  font-weight: 400;
+  max-width: 500px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+.subtitleHighlight {
+  color: var(--success);
+  font-weight: 600;
+}
+
+.infoSection {
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  border-left: 5px solid var(--accent);
+}
+
+.infoTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.infoTitle {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: white;
+}
+
+.infoDesc {
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+  margin-bottom: 0.75rem;
+}
+
+.paymentRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  justify-content: space-around;
+  align-items: center;
+}
+
+.paymentCol {
+  display: flex;
+  flex-direction: column;
+}
+
+.paymentLabel {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  display: block;
+  text-transform: uppercase;
+}
+
+.paymentValue {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--success);
+}
+
+.paymentAlias {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: white;
+  letter-spacing: 0.05em;
+}
+
+.paymentDivider {
+  border-left: 1px solid var(--border);
+  height: 40px;
+}
+
+.paymentFooter {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-top: 0.75rem;
+  text-align: center;
+  font-style: italic;
+}
+
+.tabsContainer {
+  display: flex;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: var(--radius-md);
+  padding: 0.4rem;
+  margin-bottom: 2rem;
+}
+
+.tabButton {
+  flex: 1;
+  padding: 0.8rem;
+  border: none;
+  border-radius: calc(var(--radius-md) - 4px);
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 1.05rem;
+  display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-geist-sans);
-  background-color: var(--background);
-}
-
-.main {
-  display: flex;
-  flex: 1;
-  width: 100%;
-  max-width: 800px;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: space-between;
-  background-color: var(--foreground);
-  padding: 120px 60px;
-}
-
-.intro {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-  gap: 24px;
-}
-
-.intro h1 {
-  max-width: 320px;
-  font-size: 40px;
-  font-weight: 600;
-  line-height: 48px;
-  letter-spacing: -2.4px;
-  text-wrap: balance;
-  color: var(--text-primary);
-}
-
-.intro p {
-  max-width: 440px;
-  font-size: 18px;
-  line-height: 32px;
-  text-wrap: balance;
+  gap: 0.5rem;
+  transition: var(--transition);
+  background: transparent;
   color: var(--text-secondary);
 }
 
-.intro a {
+.tabButtonActive {
+  background: var(--primary);
+  color: white;
+}
+
+.messageBox {
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 1.5rem;
   font-weight: 500;
-  color: var(--text-primary);
-}
-
-.ctas {
+  font-size: 1.05rem;
   display: flex;
-  flex-direction: row;
-  width: 100%;
-  max-width: 440px;
-  gap: 16px;
-  font-size: 14px;
-}
-
-.ctas a {
-  display: flex;
-  justify-content: center;
   align-items: center;
-  height: 40px;
-  padding: 0 16px;
-  border-radius: 128px;
-  border: 1px solid transparent;
-  transition: 0.2s;
-  cursor: pointer;
-  width: fit-content;
-  font-weight: 500;
+  gap: 0.8rem;
 }
 
-a.primary {
-  background: var(--text-primary);
-  color: var(--background);
-  gap: 8px;
+.messageBoxSuccess {
+  background: rgba(19, 184, 96, 0.15);
+  border: 1px solid var(--success);
+  color: #a3f3c8;
 }
 
-a.secondary {
-  border-color: var(--button-secondary-border);
+.messageBoxDanger {
+  background: rgba(231, 76, 60, 0.15);
+  border: 1px solid var(--danger);
+  color: #ff9c9c;
 }
 
-/* Enable hover only on non-touch devices */
-@media (hover: hover) and (pointer: fine) {
-  a.primary:hover {
-    background: var(--button-primary-hover);
-    border-color: transparent;
-  }
+.gridMobile {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
 
-  a.secondary:hover {
-    background: var(--button-secondary-hover);
-    border-color: transparent;
-  }
+.iconInline {
+  margin-right: 4px;
+  vertical-align: middle;
 }
 
 @media (max-width: 600px) {
-  .main {
-    padding: 48px 24px;
+  .brandContainer {
+    display: grid;
+    grid-template-areas:
+      "logo1 logo2"
+      "title title";
+    grid-template-columns: auto auto;
+    justify-content: center;
+    gap: 1rem;
   }
 
-  .intro {
-    gap: 16px;
+  .logoChimi {
+    grid-area: logo1;
+    width: 70px;
+    height: 70px;
   }
 
-  .intro h1 {
-    font-size: 32px;
-    line-height: 40px;
-    letter-spacing: -1.92px;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  .logo {
-    filter: invert();
+  .logoMundial {
+    grid-area: logo2;
+    width: 70px;
+    height: 70px;
   }
 
-  .page {
-    --background: #000;
-    --foreground: #000;
+  .mainTitle {
+    grid-area: title;
+    font-size: 1.8rem;
+    text-align: center;
+    max-width: 100%;
+  }
 
-    --text-primary: #ededed;
-    --text-secondary: #999;
+  .subtitle {
+    font-size: 1rem;
+  }
 
-    --button-primary-hover: #ccc;
-    --button-secondary-hover: #1a1a1a;
-    --button-secondary-border: #1a1a1a;
+  .infoSection {
+    padding: 1.2rem;
+  }
+
+  .infoTitle {
+    font-size: 1.15rem;
+  }
+
+  .infoDesc {
+    font-size: 0.95rem;
+  }
+
+  .paymentRow {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem;
+    text-align: center;
+  }
+
+  .paymentDivider {
+    display: none;
+  }
+
+  .paymentValue {
+    font-size: 1.25rem;
+  }
+
+  .paymentAlias {
+    font-size: 1.15rem;
+  }
+
+  .tabButton {
+    font-size: 0.85rem;
+    padding: 0.6rem 0.4rem;
+  }
+
+  .gridMobile {
+    grid-template-columns: 1fr;
+    gap: 0;
   }
 }
