@@ -23,7 +23,38 @@ const FLAGS = {
   'Alemania': '🇩🇪',
   'Ecuador': '🇪🇨',
   'Francia': '🇫🇷',
-  'Japón': '🇯🇵'
+  'Japón': '🇯🇵',
+  'Senegal': '🇸🇳',
+  'Curaçao': '🇨🇼',
+  'Corea del Sur': '🇰🇷',
+  'República Checa': '🇨🇿',
+  'Qatar': '🇶🇦',
+  'Suiza': '🇨🇭',
+  'Haití': '🇭🇹',
+  'Escocia': '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
+  'Australia': '🇦🇺',
+  'Turquía': '🇹🇷',
+  'Costa de Marfil': '🇨🇮',
+  'Países Bajos': '🇳🇱',
+  'Suecia': '🇸🇪',
+  'Túnez': '🇹🇳',
+  'Bélgica': '🇧🇪',
+  'Egipto': '🇪🇬',
+  'Irán': '🇮🇷',
+  'Nueva Zelanda': '🇳🇿',
+  'Uruguay': '🇺🇾',
+  'Irak': '🇮🇶',
+  'Noruega': '🇳🇴',
+  'Austria': '🇦🇹',
+  'Jordania': '🇯🇴',
+  'Portugal': '🇵🇹',
+  'RD Congo': '🇨🇩',
+  'Uzbekistán': '🇺🇿',
+  'Colombia': '🇨🇴',
+  'Inglaterra': '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+  'Croacia': '🇭🇷',
+  'Ghana': '🇬🇭',
+  'Panamá': '🇵🇦'
 };
 
 export default function Dashboard() {
@@ -273,7 +304,8 @@ export default function Dashboard() {
           <>
             {/* Pestaña: Mis Pronósticos */}
             {activeTab === 'predictions' && (
-              <div className="animate-fade-in">
+              <>
+                <div className="animate-fade-in">
                 <div className={styles.predictionsHeader}>
                   <p className={styles.predictionsDesc}>
                     Ingresá tus resultados estimados. Podés editarlos las veces que quieras hasta que comience cada partido.
@@ -396,20 +428,21 @@ export default function Dashboard() {
                     })
                   )}
                 </div>
-
-                {/* Botón flotante para guardar predicciones */}
-                <div className={styles.saveButtonContainer}>
-                  <button
-                    onClick={handleSavePredictions}
-                    className={`btn btn-accent ${styles.saveButton}`}
-                    disabled={saving}
-                  >
-                    <Save size={22} />
-                    {saving ? 'Guardando...' : 'GUARDAR MIS PRONÓSTICOS'}
-                  </button>
-                </div>
               </div>
-            )}
+
+              {/* Botón flotante para guardar predicciones */}
+              <div className={styles.saveButtonContainer}>
+                <button
+                  onClick={handleSavePredictions}
+                  className={`btn btn-accent ${styles.saveButton}`}
+                  disabled={saving}
+                >
+                  <Save size={22} />
+                  {saving ? 'Guardando...' : 'GUARDAR MIS PRONÓSTICOS'}
+                </button>
+              </div>
+            </>
+          )}
 
             {/* Pestaña: Tabla de Posiciones */}
             {activeTab === 'leaderboard' && (

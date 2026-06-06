@@ -19,7 +19,6 @@ export default function AccessPage() {
 
   // Campos de Login
   const [loginDni, setLoginDni] = useState('');
-  const [loginNombreCompleto, setLoginNombreCompleto] = useState('');
 
   // Verificar si ya tiene sesión iniciada al cargar
   useEffect(() => {
@@ -79,15 +78,14 @@ export default function AccessPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'login',
-          dni: loginDni,
-          nombreCompleto: loginNombreCompleto,
+          dni: loginDni
         }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || 'DNI o Nombre incorrectos.');
+        throw new Error(data.error || 'DNI incorrecto.');
       }
 
       setMessage({ type: 'success', text: '¡Ingreso correcto! Redirigiendo...' });
@@ -270,19 +268,6 @@ export default function AccessPage() {
                   required
                   value={loginDni}
                   onChange={(e) => setLoginDni(e.target.value.replace(/[^0-9]/g, ''))}
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label" htmlFor="login-nombre">Nombre y Apellido Completo</label>
-                <input
-                  type="text"
-                  id="login-nombre"
-                  className="form-input"
-                  placeholder="Ingresá tal cual te registraste (Ej. Juan Pérez)"
-                  required
-                  value={loginNombreCompleto}
-                  onChange={(e) => setLoginNombreCompleto(e.target.value)}
                 />
               </div>
 

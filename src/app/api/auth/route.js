@@ -58,11 +58,6 @@ export async function POST(request) {
       return Response.json({ success: true, user });
 
     } else if (action === 'login') {
-      // Validar campos de login
-      if (!nombreCompleto || !nombreCompleto.trim()) {
-        return Response.json({ error: 'El Nombre y Apellido es obligatorio para ingresar.' }, { status: 400 });
-      }
-
       // Buscar usuario por DNI
       const userRes = await db.execute({
         sql: 'SELECT * FROM users WHERE dni = ?',
@@ -71,16 +66,7 @@ export async function POST(request) {
       const user = userRes.rows[0];
 
       if (!user) {
-        return Response.json({ error: 'Usuario no encontrado. Registrate primero.' }, { status: 404 });
-      }
-
-      // Validar Nombre y Apellido de forma flexible
-      const inputNormalized = normalizeText(nombreCompleto);
-      const dbNormalized1 = normalizeText(user.nombre + user.apellido);
-      const dbNormalized2 = normalizeText(user.apellido + user.nombre);
-
-      if (inputNormalized !== dbNormalized1 && inputNormalized !== dbNormalized2) {
-        return Response.json({ error: 'El nombre y apellido no coinciden con el DNI registrado.' }, { status: 401 });
+        return Response.json({ error: 'Usuario no encontrado. Por favor registrate primero abajo.' }, { status: 404 });
       }
 
       return Response.json({ success: true, user });

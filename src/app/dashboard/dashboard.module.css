@@ -35,7 +35,7 @@
 .mainContent {
   flex-grow: 1;
   padding-top: 1.5rem;
-  padding-bottom: 8rem; /* Padding extra para que el botón flotante no tape contenido */
+  padding-bottom: 10rem !important; /* Padding extra para que el botón flotante no tape contenido */
 }
 
 .tabSelector {
@@ -113,7 +113,7 @@
   transform: translateX(-50%);
   width: calc(100% - 3rem);
   max-width: 500px;
-  zIndex: 90;
+  z-index: 90;
 }
 
 .saveButton {
@@ -264,6 +264,7 @@
   font-weight: 800;
   color: var(--text-muted);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
 }
@@ -296,7 +297,7 @@
 
   .mainContent {
     padding-top: 1rem;
-    padding-bottom: 7rem;
+    padding-bottom: 9rem !important;
   }
 
   .tabButton {

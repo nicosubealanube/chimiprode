@@ -25,8 +25,10 @@ if (process.env.NODE_ENV === 'production') {
   db = global._sqliteDb;
 }
 
-// Ejecutar inicialización de tablas y datos semilla de forma asíncrona
-await initDb(db);
+// Ejecutar inicialización de tablas y datos semilla de forma asíncrona (excepto durante la compilación de Next.js)
+if (process.env.NEXT_PHASE !== 'phase-production-build') {
+  await initDb(db);
+}
 
 export default db;
 

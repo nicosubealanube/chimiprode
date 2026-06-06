@@ -32,6 +32,37 @@ function mapTeamName(apiName) {
   if (normalized.includes('ecuad')) return 'Ecuador';
   if (normalized.includes('fran') || normalized.includes('french')) return 'Francia';
   if (normalized.includes('jap') || normalized.includes('japan')) return 'Japón';
+  if (normalized.includes('seneg')) return 'Senegal';
+  if (normalized.includes('curac') || normalized.includes('curas')) return 'Curaçao';
+  if (normalized.includes('korea') || normalized.includes('corea del s')) return 'Corea del Sur';
+  if (normalized.includes('czech') || normalized.includes('checa')) return 'República Checa';
+  if (normalized.includes('qatar')) return 'Qatar';
+  if (normalized.includes('switz') || normalized.includes('suiza')) return 'Suiza';
+  if (normalized.includes('haiti')) return 'Haití';
+  if (normalized.includes('scot') || normalized.includes('escoc')) return 'Escocia';
+  if (normalized.includes('austr') && !normalized.includes('austri')) return 'Australia';
+  if (normalized.includes('turk') || normalized.includes('turqu')) return 'Turquía';
+  if (normalized.includes('ivory') || normalized.includes('marfil')) return 'Costa de Marfil';
+  if (normalized.includes('nether') || normalized.includes('holan') || normalized.includes('paises b')) return 'Países Bajos';
+  if (normalized.includes('swed') || normalized.includes('suec')) return 'Suecia';
+  if (normalized.includes('tunis') || normalized.includes('tunez')) return 'Túnez';
+  if (normalized.includes('belg')) return 'Bélgica';
+  if (normalized.includes('egypt') || normalized.includes('egip')) return 'Egipto';
+  if (normalized.includes('iran')) return 'Irán';
+  if (normalized.includes('zeal') || normalized.includes('zelan')) return 'Nueva Zelanda';
+  if (normalized.includes('urug')) return 'Uruguay';
+  if (normalized.includes('iraq') || normalized.includes('irak')) return 'Irak';
+  if (normalized.includes('norw') || normalized.includes('noru')) return 'Noruega';
+  if (normalized.includes('austri')) return 'Austria';
+  if (normalized.includes('jord')) return 'Jordania';
+  if (normalized.includes('portu')) return 'Portugal';
+  if (normalized.includes('congo')) return 'RD Congo';
+  if (normalized.includes('uzbek')) return 'Uzbekistán';
+  if (normalized.includes('colomb')) return 'Colombia';
+  if (normalized.includes('engl') || normalized.includes('ingla')) return 'Inglaterra';
+  if (normalized.includes('croat') || normalized.includes('croac')) return 'Croacia';
+  if (normalized.includes('ghan')) return 'Ghana';
+  if (normalized.includes('panam')) return 'Panamá';
   
   return apiName;
 }
