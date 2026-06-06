@@ -19,7 +19,8 @@ export async function initDb(db) {
       fecha_hora TEXT NOT NULL,
       goles_a INTEGER DEFAULT NULL,
       goles_b INTEGER DEFAULT NULL,
-      estado TEXT DEFAULT 'pendiente'
+      estado TEXT DEFAULT 'pendiente',
+      UNIQUE(equipo_a, equipo_b, fecha_hora)
     );
 
     CREATE TABLE IF NOT EXISTS predictions (
@@ -35,6 +36,35 @@ export async function initDb(db) {
       UNIQUE(user_dni, match_id)
     );
   `);
+
+  // Migración para corregir duplicaciones existentes de partidos y predicciones
+  try {
+    await db.executeMultiple(`
+      UPDATE OR IGNORE predictions
+      SET match_id = (
+        SELECT MIN(m2.id)
+        FROM matches m2
+        JOIN matches m1 ON m1.id = predictions.match_id
+        WHERE m2.equipo_a = m1.equipo_a 
+          AND m2.equipo_b = m1.equipo_b 
+          AND m2.fecha_hora = m1.fecha_hora
+      )
+      WHERE EXISTS (
+        SELECT 1 
+        FROM matches m1 
+        WHERE m1.id = predictions.match_id
+      );
+
+      DELETE FROM matches 
+      WHERE id NOT IN (
+        SELECT MIN(id) 
+        FROM matches 
+        GROUP BY equipo_a, equipo_b, fecha_hora
+      );
+    `);
+  } catch (migrationError) {
+    console.error('Error durante la migración de deduplicación:', migrationError);
+  }
 
   // Precargar partidos si la tabla está vacía
   const res = await db.execute('SELECT COUNT(*) as count FROM matches');
@@ -150,7 +180,7 @@ export async function initDb(db) {
     }
 
     const statements = seedMatches.map(m => ({
-      sql: `INSERT INTO matches (equipo_a, equipo_b, grupo_fase, fecha_hora)
+      sql: `INSERT OR IGNORE INTO matches (equipo_a, equipo_b, grupo_fase, fecha_hora)
             VALUES (?, ?, ?, ?)`,
       args: [m.equipo_a, m.equipo_b, m.grupo_fase, m.fecha_hora]
     }));

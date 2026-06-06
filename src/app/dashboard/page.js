@@ -59,13 +59,7 @@ const FLAGS = {
 
 export default function Dashboard() {
   const router = useRouter();
-  const [user, setUser] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const savedUser = localStorage.getItem('chimiUser');
-      return savedUser ? JSON.parse(savedUser) : null;
-    }
-    return null;
-  });
+  const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState('predictions'); // 'predictions' o 'leaderboard'
   const [matches, setMatches] = useState([]);
   const [leaderboard, setLeaderboard] = useState([]);
@@ -107,16 +101,17 @@ export default function Dashboard() {
     }
   };
 
-  // Cargar datos de usuario al montar
+  // Verificar sesión en el cliente y cargar datos
   useEffect(() => {
-    if (!user) {
+    const savedUser = localStorage.getItem('chimiUser');
+    if (!savedUser) {
       router.push('/');
       return;
     }
-    Promise.resolve().then(() => {
-      fetchData(user.dni);
-    });
-  }, [router, user]);
+    const parsedUser = JSON.parse(savedUser);
+    setUser(parsedUser);
+    fetchData(parsedUser.dni);
+  }, [router]);
 
   const handleLogout = () => {
     localStorage.removeItem('chimiUser');
