@@ -66,11 +66,11 @@ export async function initDb(db) {
     console.error('Error durante la migración de deduplicación:', migrationError);
   }
 
-  // Precargar partidos si la tabla está vacía
+  // Precargar partidos si la tabla está incompleta o vacía (menos de 72 partidos)
   const res = await db.execute('SELECT COUNT(*) as count FROM matches');
   const count = res.rows[0]?.count ?? res.rows[0]?.['COUNT(*)'] ?? res.rows[0]?.['count(*)'] ?? 0;
 
-  if (Number(count) === 0) {
+  if (Number(count) < 72) {
     const GROUPS = {
       'Grupo A': ['México', 'Sudáfrica', 'Corea del Sur', 'República Checa'],
       'Grupo B': ['Canadá', 'Bosnia', 'Qatar', 'Suiza'],
