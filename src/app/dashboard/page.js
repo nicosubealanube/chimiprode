@@ -8,6 +8,7 @@ import { Trophy, Calendar, CheckCircle2, Lock, Save, LogOut, Search, RefreshCw, 
 const FLAGS = {
   'Argentina': '🇦🇷',
   'Arabia Saudita': '🇸🇦',
+  'Argelia': '🇩🇿',
   'México': '🇲🇽',
   'Sudáfrica': '🇿🇦',
   'Canadá': '🇨🇦',

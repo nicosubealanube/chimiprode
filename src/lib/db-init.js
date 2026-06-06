@@ -45,7 +45,7 @@ export async function initDb(db) {
       { equipo_a: 'México', equipo_b: 'Sudáfrica', grupo_fase: 'Grupo A', fecha_hora: '2026-06-11T17:00:00' },
       { equipo_a: 'Canadá', equipo_b: 'Bosnia', grupo_fase: 'Grupo B', fecha_hora: '2026-06-12T16:00:00' },
       { equipo_a: 'EE. UU.', equipo_b: 'Paraguay', grupo_fase: 'Grupo D', fecha_hora: '2026-06-12T20:00:00' },
-      { equipo_a: 'Argentina', equipo_b: 'Arabia Saudita', grupo_fase: 'Grupo H', fecha_hora: '2026-06-13T15:00:00' },
+      { equipo_a: 'Argentina', equipo_b: 'Argelia', grupo_fase: 'Grupo J', fecha_hora: '2026-06-16T20:00:00' },
       { equipo_a: 'España', equipo_b: 'Cabo Verde', grupo_fase: 'Grupo H', fecha_hora: '2026-06-14T12:00:00' },
       { equipo_a: 'Brasil', equipo_b: 'Marruecos', grupo_fase: 'Grupo C', fecha_hora: '2026-06-14T18:00:00' },
       { equipo_a: 'Alemania', equipo_b: 'Ecuador', grupo_fase: 'Grupo E', fecha_hora: '2026-06-15T14:00:00' },

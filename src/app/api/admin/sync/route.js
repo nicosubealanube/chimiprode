@@ -17,6 +17,7 @@ function mapTeamName(apiName) {
   
   if (normalized.includes('arg')) return 'Argentina';
   if (normalized.includes('arab') || normalized.includes('saudi')) return 'Arabia Saudita';
+  if (normalized.includes('alger') || normalized.includes('argel')) return 'Argelia';
   if (normalized.includes('mexic')) return 'México';
   if (normalized.includes('sudaf') || normalized.includes('south africa')) return 'Sudáfrica';
   if (normalized.includes('canad')) return 'Canadá';
