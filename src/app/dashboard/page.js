@@ -189,11 +189,12 @@ export default function Dashboard() {
     return fullName.includes(searchTerm.toLowerCase()) || entry.dni.includes(searchTerm);
   });
 
-  // Verificar si un partido está cerrado (ya empezó)
+  // Verificar si un partido está cerrado (2 horas antes de que comience)
   const isMatchClosed = (matchDateString) => {
     const now = new Date();
     const matchTime = new Date(matchDateString);
-    return now >= matchTime;
+    const limitTime = new Date(matchTime.getTime() - 2 * 60 * 60 * 1000);
+    return now >= limitTime;
   };
 
   // Formatear fecha legible
@@ -303,7 +304,7 @@ export default function Dashboard() {
                 <div className="animate-fade-in">
                 <div className={styles.predictionsHeader}>
                   <p className={styles.predictionsDesc}>
-                    Ingresá tus resultados estimados. Podés editarlos las veces que quieras hasta que comience cada partido.
+                    Ingresá tus resultados estimados. Podés editarlos las veces que quieras hasta 2 horas antes de que comience cada partido.
                   </p>
                 </div>
 
