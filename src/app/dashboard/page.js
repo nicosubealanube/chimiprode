@@ -189,11 +189,11 @@ export default function Dashboard() {
     return fullName.includes(searchTerm.toLowerCase()) || entry.dni.includes(searchTerm);
   });
 
-  // Verificar si un partido está cerrado (2 horas antes de que comience)
+  // Verificar si un partido está cerrado (1 hora antes de que comience)
   const isMatchClosed = (matchDateString) => {
     const now = new Date();
     const matchTime = new Date(matchDateString);
-    const limitTime = new Date(matchTime.getTime() - 2 * 60 * 60 * 1000);
+    const limitTime = new Date(matchTime.getTime() - 1 * 60 * 60 * 1000);
     return now >= limitTime;
   };
 
@@ -204,6 +204,115 @@ export default function Dashboard() {
     // Cambiar primer letra a mayúscula
     const formatted = date.toLocaleDateString('es-AR', options);
     return formatted.charAt(0).toUpperCase() + formatted.slice(1) + ' hs';
+  };
+
+  const renderMatchCard = (match) => {
+    const closed = isMatchClosed(match.fecha_hora) || match.estado === 'jugado';
+    return (
+      <div key={match.id} className={`match-card ${closed ? 'locked' : ''}`}>
+        
+        {/* Cabecera del Partido */}
+        <div className="match-info-header">
+          <span>{match.grupo_fase}</span>
+          <span>{formatMatchDate(match.fecha_hora)}</span>
+        </div>
+
+        <div className={styles.matchBody}>
+          {/* Equipo A Row */}
+          <div className={styles.teamRowA}>
+            <div className={styles.teamInfo}>
+              <span className={styles.teamName}>{match.equipo_a}</span>
+              <span className={styles.flag}>{FLAGS[match.equipo_a] || '🏳️'}</span>
+            </div>
+            <input
+              type="text"
+              maxLength="2"
+              inputMode="numeric"
+              className="score-input"
+              value={match.goles_pred_a}
+              onChange={(e) => handleScoreChange(match.id, 'a', e.target.value)}
+              disabled={closed}
+              placeholder="-"
+            />
+          </div>
+
+          {/* VS Divider & Closed Status */}
+          <div className={styles.vsDivider}>
+            <span style={{ fontWeight: '800', color: 'var(--text-muted)' }}>VS</span>
+            {closed ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', color: 'var(--accent)', marginTop: '4px', fontWeight: '600' }}>
+                <Lock size={12} />
+                Cerrado
+              </div>
+            ) : (
+              <div style={{ fontSize: '0.8rem', color: 'var(--success)', marginTop: '4px', fontWeight: '500' }}>
+                Votar
+              </div>
+            )}
+          </div>
+
+          {/* Equipo B Row */}
+          <div className={styles.teamRowB}>
+            <input
+              type="text"
+              maxLength="2"
+              inputMode="numeric"
+              className={`score-input ${styles.scoreInput}`}
+              value={match.goles_pred_b}
+              onChange={(e) => handleScoreChange(match.id, 'b', e.target.value)}
+              disabled={closed}
+              placeholder="-"
+            />
+            <div className={styles.teamInfo}>
+              <span className={styles.flag}>{FLAGS[match.equipo_b] || '🏳️'}</span>
+              <span className={styles.teamName}>{match.equipo_b}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Status only on mobile (since vsDivider is hidden on mobile) */}
+        <div className="show-mobile" style={{ textAlign: 'center', width: '100%', marginTop: '0.25rem' }}>
+          {closed ? (
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', color: 'var(--accent)', fontWeight: '600' }}>
+              <Lock size={12} />
+              Cerrado
+            </div>
+          ) : (
+            <div style={{ fontSize: '0.8rem', color: 'var(--success)', fontWeight: '500' }}>
+              Abierto para votar
+            </div>
+          )}
+        </div>
+
+        {/* Resultados Reales y Puntuación Obtenida */}
+        {match.estado === 'jugado' && match.goles_reales_a !== null && (
+          <div style={{
+            gridColumn: 'span 3',
+            marginTop: '0.75rem',
+            paddingTop: '0.75rem',
+            borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}>
+            <span style={{ fontSize: '0.95rem', color: 'var(--text-secondary)' }}>
+              Resultado Real: <strong style={{ color: 'white' }}>{match.goles_reales_a} - {match.goles_reales_b}</strong>
+            </span>
+            
+            {match.puntos_obtenidos !== null && (
+              <span className={`points-badge ${
+                match.puntos_obtenidos === 3 ? 'points-exact' : 
+                match.puntos_obtenidos === 1 ? 'points-outcome' : 'points-zero'
+              }`}>
+                {match.puntos_obtenidos === 3 ? '+3 PTS (Exacto)' : 
+                 match.puntos_obtenidos === 1 ? '+1 PTS (Acierto)' : '0 PTS'}
+              </span>
+            )}
+          </div>
+        )}
+
+      </div>
+    );
   };
 
   return (
@@ -304,124 +413,41 @@ export default function Dashboard() {
                 <div className="animate-fade-in">
                 <div className={styles.predictionsHeader}>
                   <p className={styles.predictionsDesc}>
-                    Ingresá tus resultados estimados. Podés editarlos las veces que quieras hasta 2 horas antes de que comience cada partido.
+                    Ingresá tus resultados estimados. Podés editarlos las veces que quieras hasta 1 hora antes de que comience cada partido.
                   </p>
                 </div>
 
-                {/* Lista de Partidos */}
-                <div className={styles.matchesList}>
-                  {matches.length === 0 ? (
+                {/* Lista de Partidos Agrupada */}
+                <div>
+                  {/* Fase Eliminatoria (Se muestra al principio, abierta siempre) */}
+                  {matches.filter(m => !m.grupo_fase.startsWith('Grupo')).length > 0 && (
+                    <div style={{ marginBottom: '2.5rem' }}>
+                      <h3 className={styles.sectionHeader}>
+                        🏆 Fase Eliminatoria (Octavos / 16avos)
+                      </h3>
+                      <div className={styles.matchesList}>
+                        {matches.filter(m => !m.grupo_fase.startsWith('Grupo')).map(renderMatchCard)}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Fase de Grupos (Colapsable y cerrada por defecto si ya hay eliminatorias) */}
+                  {matches.filter(m => m.grupo_fase.startsWith('Grupo')).length > 0 && (
+                    <details 
+                      className={styles.detailsGroup} 
+                      open={matches.filter(m => !m.grupo_fase.startsWith('Grupo')).length === 0}
+                    >
+                      <summary className={styles.summaryGroup}>
+                        <span>⚽ Fase de Grupos (Terminada)</span>
+                      </summary>
+                      <div className={styles.matchesList} style={{ padding: '1rem', borderTop: '1px solid var(--border)' }}>
+                        {matches.filter(m => m.grupo_fase.startsWith('Grupo')).map(renderMatchCard)}
+                      </div>
+                    </details>
+                  )}
+
+                  {matches.length === 0 && (
                     <p className={styles.emptyMatches}>No hay partidos cargados actualmente.</p>
-                  ) : (
-                    matches.map((match) => {
-                      const closed = isMatchClosed(match.fecha_hora) || match.estado === 'jugado';
-
-                      return (
-                        <div key={match.id} className={`match-card ${closed ? 'locked' : ''}`}>
-                          
-                          {/* Cabecera del Partido */}
-                          <div className="match-info-header">
-                            <span>{match.grupo_fase}</span>
-                            <span>{formatMatchDate(match.fecha_hora)}</span>
-                          </div>
-
-                          <div className={styles.matchBody}>
-                            {/* Equipo A Row */}
-                            <div className={styles.teamRowA}>
-                              <div className={styles.teamInfo}>
-                                <span className={styles.teamName}>{match.equipo_a}</span>
-                                <span className={styles.flag}>{FLAGS[match.equipo_a] || '🏳️'}</span>
-                              </div>
-                              <input
-                                type="text"
-                                maxLength="2"
-                                inputMode="numeric"
-                                className="score-input"
-                                value={match.goles_pred_a}
-                                onChange={(e) => handleScoreChange(match.id, 'a', e.target.value)}
-                                disabled={closed}
-                                placeholder="-"
-                              />
-                            </div>
-
-                            {/* VS Divider & Closed Status */}
-                            <div className={styles.vsDivider}>
-                              <span style={{ fontWeight: '800', color: 'var(--text-muted)' }}>VS</span>
-                              {closed ? (
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', color: 'var(--accent)', marginTop: '4px', fontWeight: '600' }}>
-                                  <Lock size={12} />
-                                  Cerrado
-                                </div>
-                              ) : (
-                                <div style={{ fontSize: '0.8rem', color: 'var(--success)', marginTop: '4px', fontWeight: '500' }}>
-                                  Votar
-                                </div>
-                              )}
-                            </div>
-
-                            {/* Equipo B Row */}
-                            <div className={styles.teamRowB}>
-                              <input
-                                type="text"
-                                maxLength="2"
-                                inputMode="numeric"
-                                className={`score-input ${styles.scoreInput}`}
-                                value={match.goles_pred_b}
-                                onChange={(e) => handleScoreChange(match.id, 'b', e.target.value)}
-                                disabled={closed}
-                                placeholder="-"
-                              />
-                              <div className={styles.teamInfo}>
-                                <span className={styles.flag}>{FLAGS[match.equipo_b] || '🏳️'}</span>
-                                <span className={styles.teamName}>{match.equipo_b}</span>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Status only on mobile (since vsDivider is hidden on mobile) */}
-                          <div className="show-mobile" style={{ textAlign: 'center', width: '100%', marginTop: '0.25rem' }}>
-                            {closed ? (
-                              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', color: 'var(--accent)', fontWeight: '600' }}>
-                                <Lock size={12} />
-                                Cerrado
-                              </div>
-                            ) : (
-                              <div style={{ fontSize: '0.8rem', color: 'var(--success)', fontWeight: '500' }}>
-                                Abierto para votar
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Resultados Reales y Puntuación Obtenida */}
-                          {match.estado === 'jugado' && match.goles_reales_a !== null && (
-                            <div style={{
-                              gridColumn: 'span 3',
-                              marginTop: '0.75rem',
-                              paddingTop: '0.75rem',
-                              borderTop: '1px solid rgba(255, 255, 255, 0.05)',
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                              alignItems: 'center'
-                            }}>
-                              <span style={{ fontSize: '0.95rem', color: 'var(--text-secondary)' }}>
-                                Resultado Real: <strong style={{ color: 'white' }}>{match.goles_reales_a} - {match.goles_reales_b}</strong>
-                              </span>
-                              
-                              {match.puntos_obtenidos !== null && (
-                                <span className={`points-badge ${
-                                  match.puntos_obtenidos === 3 ? 'points-exact' : 
-                                  match.puntos_obtenidos === 1 ? 'points-outcome' : 'points-zero'
-                                }`}>
-                                  {match.puntos_obtenidos === 3 ? '+3 PTS (Exacto)' : 
-                                   match.puntos_obtenidos === 1 ? '+1 PTS (Acierto)' : '0 PTS'}
-                                </span>
-                              )}
-                            </div>
-                          )}
-
-                        </div>
-                      );
-                    })
                   )}
                 </div>
               </div>

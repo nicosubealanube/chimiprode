@@ -31,7 +31,25 @@ export async function POST(request) {
   }
 
   try {
-    const { matchId, golesA, golesB, estado } = await request.json();
+    const body = await request.json();
+    const { action } = body;
+
+    if (action === 'create') {
+      const { equipoA, equipoB, grupoFase, fechaHora } = body;
+      if (!equipoA || !equipoA.trim() || !equipoB || !equipoB.trim() || !grupoFase || !grupoFase.trim() || !fechaHora) {
+        return Response.json({ error: 'Todos los campos son obligatorios.' }, { status: 400 });
+      }
+
+      await db.execute({
+        sql: `INSERT INTO matches (equipo_a, equipo_b, grupo_fase, fecha_hora, estado)
+              VALUES (?, ?, ?, ?, 'pendiente')`,
+        args: [equipoA.trim(), equipoB.trim(), grupoFase.trim(), fechaHora]
+      });
+
+      return Response.json({ success: true, message: 'Partido creado exitosamente.' });
+    }
+
+    const { matchId, golesA, golesB, estado } = body;
 
     if (matchId === undefined) {
       return Response.json({ error: 'ID de partido requerido.' }, { status: 400 });

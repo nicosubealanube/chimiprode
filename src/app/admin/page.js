@@ -28,6 +28,17 @@ export default function AdminDashboard() {
   // Estados para cargar resultados
   const [localScores, setLocalScores] = useState({});
 
+  // Estados para creación de partidos
+  const [newEquipoA, setNewEquipoA] = useState('');
+  const [newEquipoB, setNewEquipoB] = useState('');
+  const [newGrupoFase, setNewGrupoFase] = useState('16avos de Final');
+  const [newFechaHora, setNewFechaHora] = useState('');
+  const [createLoading, setCreateLoading] = useState(false);
+
+  // Estados para restauración de backup
+  const [restoreFile, setRestoreFile] = useState(null);
+  const [restoreLoading, setRestoreLoading] = useState(false);
+
   const verifyAndLoad = async (token) => {
     setLoading(true);
     setError('');
@@ -257,6 +268,101 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleCreateMatch = async (e) => {
+    e.preventDefault();
+    if (!newEquipoA || !newEquipoB || !newFechaHora) {
+      setError('Por favor completa todos los campos para crear el partido.');
+      return;
+    }
+    setCreateLoading(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      const res = await fetch('/api/admin/matches', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${adminToken}`
+        },
+        body: JSON.stringify({
+          action: 'create',
+          equipoA: newEquipoA,
+          equipoB: newEquipoB,
+          grupoFase: newGrupoFase,
+          fechaHora: newFechaHora
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Error al crear el partido.');
+
+      setSuccess(`Partido "${newEquipoA} vs ${newEquipoB}" creado correctamente.`);
+      setNewEquipoA('');
+      setNewEquipoB('');
+      setNewFechaHora('');
+      
+      // Recargar partidos
+      verifyAndLoad(adminToken);
+    } catch (err) {
+      setError(err.message || 'Error al crear partido.');
+    } finally {
+      setCreateLoading(false);
+    }
+  };
+
+  const handleRestoreBackup = async (e) => {
+    e.preventDefault();
+    if (!restoreFile) {
+      setError('Por favor selecciona un archivo JSON de backup.');
+      return;
+    }
+
+    if (!confirm('⚠️ ¿Estás absolutamente seguro de restaurar? Se borrarán todos los datos actuales de usuarios y partidos e insertarán los del archivo.')) {
+      return;
+    }
+
+    setRestoreLoading(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      const fileReader = new FileReader();
+      fileReader.onload = async (event) => {
+        try {
+          const backupJson = JSON.parse(event.target.result);
+          
+          const res = await fetch('/api/admin/backup', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${adminToken}`
+            },
+            body: JSON.stringify(backupJson)
+          });
+
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Error al restaurar.');
+
+          setSuccess(`¡Base de datos restaurada! Se cargaron: ${data.stats.users} usuarios, ${data.stats.matches} partidos y ${data.stats.predictions} predicciones.`);
+          setRestoreFile(null);
+          document.getElementById('backup-upload-input').value = '';
+
+          // Recargar todos los datos
+          verifyAndLoad(adminToken);
+        } catch (parseErr) {
+          setError(`Error al leer el archivo JSON: ${parseErr.message}`);
+          setRestoreLoading(false);
+        }
+      };
+      
+      fileReader.readAsText(restoreFile);
+    } catch (err) {
+      setError(err.message || 'Error al procesar el archivo.');
+      setRestoreLoading(false);
+    }
+  };
+
   // Generar link de WhatsApp
   const getWhatsAppLink = (celular, nombre) => {
     // Normalizar número eliminando caracteres no numéricos
@@ -344,21 +450,59 @@ export default function AdminDashboard() {
         )}
 
         {/* Tab Selector */}
-        <div className={styles.tabSelector}>
+        <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', marginBottom: '2rem', gap: '1rem', flexWrap: 'wrap' }}>
           <button
-            onClick={() => { setActiveTab('payments'); setError(''); setSuccess(''); }}
-            className={`${styles.tabButton} ${activeTab === 'payments' ? styles.tabButtonActive : ''}`}
+            onClick={() => { setActiveTab('payments'); setError(''); setSuccess(''); setSyncResult(null); }}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              borderBottom: activeTab === 'payments' ? '3px solid var(--accent)' : '3px solid transparent',
+              color: activeTab === 'payments' ? 'white' : 'var(--text-secondary)',
+              padding: '1rem 0.5rem',
+              fontSize: '1.1rem',
+              fontWeight: '700',
+              cursor: 'pointer',
+              flex: 1,
+              minWidth: '150px'
+            }}
           >
-            <span className="hide-mobile">Aprobación de Pagos ({pendingUsers.length} pendientes)</span>
-            <span className="show-mobile">Pagos ({pendingUsers.length})</span>
+            Aprobación de Pagos ({pendingUsers.length} pendientes)
           </button>
           
           <button
-            onClick={() => { setActiveTab('matches'); setError(''); setSuccess(''); }}
-            className={`${styles.tabButton} ${activeTab === 'matches' ? styles.tabButtonActive : ''}`}
+            onClick={() => { setActiveTab('matches'); setError(''); setSuccess(''); setSyncResult(null); }}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              borderBottom: activeTab === 'matches' ? '3px solid var(--accent)' : '3px solid transparent',
+              color: activeTab === 'matches' ? 'white' : 'var(--text-secondary)',
+              padding: '1rem 0.5rem',
+              fontSize: '1.1rem',
+              fontWeight: '700',
+              cursor: 'pointer',
+              flex: 1,
+              minWidth: '150px'
+            }}
           >
-            <span className="hide-mobile">Cargar Resultados de Partidos</span>
-            <span className="show-mobile">Resultados</span>
+            Cargar Resultados de Partidos
+          </button>
+
+          <button
+            onClick={() => { setActiveTab('config'); setError(''); setSuccess(''); setSyncResult(null); }}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              borderBottom: activeTab === 'config' ? '3px solid var(--accent)' : '3px solid transparent',
+              color: activeTab === 'config' ? 'white' : 'var(--text-secondary)',
+              padding: '1rem 0.5rem',
+              fontSize: '1.1rem',
+              fontWeight: '700',
+              cursor: 'pointer',
+              flex: 1,
+              minWidth: '150px'
+            }}
+          >
+            ⚙️ Respaldo y Configuración
           </button>
         </div>
 
@@ -613,6 +757,149 @@ export default function AdminDashboard() {
                     })
                   )}
                 </div>
+              </div>
+            )}
+
+            {/* Pestaña: Configuración y Respaldo */}
+            {activeTab === 'config' && (
+              <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                
+                {/* Herramientas de Base de Datos (Backup y Restauración) */}
+                <div className="card" style={{ padding: '2rem' }}>
+                  <h3 style={{ fontSize: '1.4rem', fontWeight: '800', marginBottom: '1rem', color: 'white' }}>💾 Copias de Seguridad y Respaldo</h3>
+                  
+                  <div className="alert alert-warning" style={{ marginBottom: '1.5rem' }}>
+                    <ShieldAlert className="alert-icon" style={{ color: 'var(--accent)' }} />
+                    <div>
+                      <strong>¡Atención!</strong> La restauración de datos es una operación destructiva. Eliminará todos los usuarios, partidos y pronósticos actuales en la base de datos e importará los datos del archivo JSON seleccionado. Se recomienda descargar una copia de seguridad antes de cualquier cambio.
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', alignItems: 'flex-start' }}>
+                    
+                    {/* Descargar Backup */}
+                    <div style={{ flex: 1, minWidth: '280px', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                      <h4 style={{ fontWeight: '700', fontSize: '1.1rem', color: 'white' }}>1. Descargar Respaldo</h4>
+                      <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+                        Guarda una copia completa del prode (usuarios registrados, partidos creados y sus pronósticos cargados) en tu computadora en formato JSON.
+                      </p>
+                      <a
+                        href={`/api/admin/backup?token=${adminToken}`}
+                        download="backup-chimi-prode.json"
+                        className="btn btn-accent"
+                        style={{ padding: '0.85rem 1.5rem', width: 'auto', display: 'inline-flex', alignSelf: 'flex-start', textDecoration: 'none' }}
+                      >
+                        ⬇️ Descargar Backup JSON
+                      </a>
+                    </div>
+
+                    <div style={{ borderLeft: '1px solid var(--border)', height: '150px' }} className="hide-mobile"></div>
+
+                    {/* Restaurar Backup */}
+                    <form onSubmit={handleRestoreBackup} style={{ flex: 1, minWidth: '280px', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                      <h4 style={{ fontWeight: '700', fontSize: '1.1rem', color: 'white' }}>2. Restaurar Respaldo</h4>
+                      <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+                        Sube un archivo de respaldo JSON previamente descargado para sobreescribir la base de datos.
+                      </p>
+                      <div className="form-group">
+                        <input
+                          type="file"
+                          id="backup-upload-input"
+                          accept=".json"
+                          className="form-input"
+                          style={{ padding: '0.5rem 0.8rem', fontSize: '0.95rem' }}
+                          onChange={(e) => setRestoreFile(e.target.files[0])}
+                          required
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        className="btn btn-outline"
+                        style={{ padding: '0.85rem 1.5rem', width: 'auto', display: 'inline-flex', alignSelf: 'flex-start', borderColor: 'var(--danger)', color: '#ff7a7a' }}
+                        disabled={restoreLoading}
+                      >
+                        {restoreLoading ? 'Restaurando...' : '⚠️ Subir y Restaurar'}
+                      </button>
+                    </form>
+
+                  </div>
+                </div>
+
+                {/* Crear Nuevo Partido */}
+                <div className="card" style={{ padding: '2rem' }}>
+                  <h3 style={{ fontSize: '1.4rem', fontWeight: '800', marginBottom: '1rem', color: 'white' }}>⚽ Crear Nuevo Partido (Knockouts)</h3>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', marginBottom: '1.5rem' }}>
+                    Cargá un nuevo partido de forma manual. Este partido se mostrará inmediatamente en el prode de los usuarios para que puedan votar.
+                  </p>
+
+                  <form onSubmit={handleCreateMatch} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }} className="grid-mobile">
+                    
+                    <div className="form-group">
+                      <label className="form-label">Fase / Etapa</label>
+                      <select
+                        className="form-input"
+                        value={newGrupoFase}
+                        onChange={(e) => setNewGrupoFase(e.target.value)}
+                        required
+                      >
+                        <option value="16avos de Final">16avos de Final</option>
+                        <option value="Octavos de Final">Octavos de Final</option>
+                        <option value="Cuartos de Final">Cuartos de Final</option>
+                        <option value="Semifinal">Semifinal</option>
+                        <option value="Tercer Puesto">Tercer Puesto</option>
+                        <option value="Final">Final</option>
+                      </select>
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">Fecha y Hora de Kickoff</label>
+                      <input
+                        type="datetime-local"
+                        className="form-input"
+                        value={newFechaHora}
+                        onChange={(e) => setNewFechaHora(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">Equipo A (Local)</label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        placeholder="Ej. Argentina"
+                        value={newEquipoA}
+                        onChange={(e) => setNewEquipoA(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">Equipo B (Visitante)</label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        placeholder="Ej. México"
+                        value={newEquipoB}
+                        onChange={(e) => setNewEquipoB(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <div style={{ gridColumn: 'span 2' }}>
+                      <button
+                        type="submit"
+                        className="btn btn-accent"
+                        style={{ padding: '0.85rem 2rem', width: 'auto', display: 'inline-flex' }}
+                        disabled={createLoading}
+                      >
+                        {createLoading ? 'Creando...' : '⚽ Crear Partido'}
+                      </button>
+                    </div>
+
+                  </form>
+                </div>
+
               </div>
             )}
           </>

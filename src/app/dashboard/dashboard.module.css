@@ -371,3 +371,67 @@
     font-size: 1.75rem;
   }
 }
+
+/* Estilos de agrupación y colapsables (Fase de Grupos vs Knockouts) */
+.sectionHeader {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: white;
+  margin-top: 1rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.5rem;
+}
+
+.detailsGroup {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: rgba(14, 30, 38, 0.35);
+  margin-bottom: 2rem;
+  overflow: hidden;
+  transition: var(--transition);
+}
+
+.detailsGroup[open] {
+  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(14, 30, 38, 0.6);
+}
+
+.summaryGroup {
+  padding: 1.2rem 1.5rem;
+  font-weight: 700;
+  font-size: 1.15rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  list-style: none; /* Quitar flecha nativa */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+  transition: var(--transition);
+}
+
+.summaryGroup::-webkit-details-marker {
+  display: none; /* Quitar flecha en Safari */
+}
+
+.summaryGroup::after {
+  content: '▼';
+  font-size: 0.8rem;
+  transition: var(--transition);
+  color: var(--text-muted);
+}
+
+.detailsGroup[open] .summaryGroup::after {
+  transform: rotate(180deg);
+  color: var(--accent);
+}
+
+.summaryGroup:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.03);
+}
+

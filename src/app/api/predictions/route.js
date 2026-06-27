@@ -94,11 +94,11 @@ export async function POST(request) {
         continue;
       }
 
-      // Verificar el bloqueo por horario (2 horas antes)
+      // Verificar el bloqueo por horario (1 hora antes)
       const matchTime = new Date(match.fecha_hora);
-      const limitTime = new Date(matchTime.getTime() - 2 * 60 * 60 * 1000);
+      const limitTime = new Date(matchTime.getTime() - 1 * 60 * 60 * 1000);
       if (now >= limitTime || match.estado === 'jugado') {
-        errors.push(`El partido ${match.equipo_a} vs ${match.equipo_b} ya comenzó o falta menos de 2 horas para su inicio. No podés cambiar tu predicción.`);
+        errors.push(`El partido ${match.equipo_a} vs ${match.equipo_b} ya comenzó o falta menos de 1 hora para su inicio. No podés cambiar tu predicción.`);
         continue;
       }
 
