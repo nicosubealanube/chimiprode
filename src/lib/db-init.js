@@ -154,11 +154,14 @@ export async function initDb(db) {
       );
 
       if (!official) {
-        // Si el partido no pertenece al fixture oficial (ej. Francia vs Japón), lo borramos
-        migrationStatements.push({
-          sql: 'DELETE FROM matches WHERE id = ?',
-          args: [dbMatch.id]
-        });
+        // Si el partido no pertenece al fixture oficial (ej. Francia vs Japón) y es de Fase de Grupos, lo borramos.
+        // De esta manera no eliminamos partidos de fases eliminatorias (16avos, octavos, etc.) cargados dinámicamente.
+        if (dbMatch.grupo_fase && dbMatch.grupo_fase.startsWith('Grupo')) {
+          migrationStatements.push({
+            sql: 'DELETE FROM matches WHERE id = ?',
+            args: [dbMatch.id]
+          });
+        }
         continue;
       }
 
