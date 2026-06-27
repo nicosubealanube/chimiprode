@@ -39,6 +39,14 @@ export default function AdminDashboard() {
   const [restoreFile, setRestoreFile] = useState(null);
   const [restoreLoading, setRestoreLoading] = useState(false);
 
+  // Estados para edición de partidos
+  const [editingMatchId, setEditingMatchId] = useState(null);
+  const [editEquipoA, setEditEquipoA] = useState('');
+  const [editEquipoB, setEditEquipoB] = useState('');
+  const [editGrupoFase, setEditGrupoFase] = useState('');
+  const [editFechaHora, setEditFechaHora] = useState('');
+  const [editLoading, setEditLoading] = useState(false);
+
   const verifyAndLoad = async (token) => {
     setLoading(true);
     setError('');
@@ -265,6 +273,48 @@ export default function AdminDashboard() {
       setError(err.message || 'Error de sincronización.');
     } finally {
       setSyncLoading(false);
+    }
+  };
+
+  const handleSaveEditDetails = async (e, matchId) => {
+    e.preventDefault();
+    if (!editEquipoA || !editEquipoB || !editFechaHora || !editGrupoFase) {
+      setError('Por favor completa todos los campos.');
+      return;
+    }
+    setEditLoading(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      const res = await fetch('/api/admin/matches', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${adminToken}`
+        },
+        body: JSON.stringify({
+          action: 'edit',
+          matchId,
+          equipoA: editEquipoA,
+          equipoB: editEquipoB,
+          grupoFase: editGrupoFase,
+          fechaHora: editFechaHora
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Error al guardar los detalles del partido.');
+
+      setSuccess('Detalles del partido actualizados exitosamente.');
+      setEditingMatchId(null);
+      
+      // Recargar partidos
+      verifyAndLoad(adminToken);
+    } catch (err) {
+      setError(err.message || 'Error al guardar.');
+    } finally {
+      setEditLoading(false);
     }
   };
 
@@ -671,7 +721,7 @@ export default function AdminDashboard() {
                 </div>
 
                 <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>
-                  O ingresá los resultados reales de forma manual a continuación. Al guardar, se recalcularán los puntos de todos los usuarios de forma instantánea.
+O ingresá los resultados reales de forma manual a continuación. Al guardar, se recalcularán los puntos de todos los usuarios de forma instantánea.
                 </p>
 
                 <div className={styles.adminMatchList}>
@@ -681,22 +731,101 @@ export default function AdminDashboard() {
                     matches.map((m) => {
                       const localMatch = localScores[m.id] || { goles_a: '', goles_b: '', estado: 'pendiente' };
                       const isPlayed = m.estado === 'jugado';
+                      const isEditing = editingMatchId === m.id;
+
+                      if (isEditing) {
+                        return (
+                          <div key={m.id} className={`card ${styles.matchCard} animate-fade-in`} style={{ padding: '1.5rem', border: '2px solid var(--accent)' }}>
+                            <h4 style={{ fontWeight: '800', marginBottom: '1rem', color: 'var(--accent)' }}>✏️ Editar Partido #{m.id}</h4>
+                            <form onSubmit={(e) => handleSaveEditDetails(e, m.id)} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                              <div className="form-group" style={{ marginBottom: '0.5rem' }}>
+                                <label className="form-label" style={{ fontSize: '0.8rem' }}>Fase / Etapa</label>
+                                <input
+                                  type="text"
+                                  className="form-input"
+                                  style={{ padding: '0.6rem 0.8rem', fontSize: '0.95rem' }}
+                                  value={editGrupoFase}
+                                  onChange={(e) => setEditGrupoFase(e.target.value)}
+                                  required
+                                />
+                              </div>
+                              <div className="form-group" style={{ marginBottom: '0.5rem' }}>
+                                <label className="form-label" style={{ fontSize: '0.8rem' }}>Fecha y Hora</label>
+                                <input
+                                  type="datetime-local"
+                                  className="form-input"
+                                  style={{ padding: '0.6rem 0.8rem', fontSize: '0.95rem' }}
+                                  value={editFechaHora}
+                                  onChange={(e) => setEditFechaHora(e.target.value)}
+                                  required
+                                />
+                              </div>
+                              <div className="form-group" style={{ marginBottom: '0.5rem' }}>
+                                <label className="form-label" style={{ fontSize: '0.8rem' }}>Equipo A (Local)</label>
+                                <input
+                                  type="text"
+                                  className="form-input"
+                                  style={{ padding: '0.6rem 0.8rem', fontSize: '0.95rem' }}
+                                  value={editEquipoA}
+                                  onChange={(e) => setEditEquipoA(e.target.value)}
+                                  required
+                                />
+                              </div>
+                              <div className="form-group" style={{ marginBottom: '0.5rem' }}>
+                                <label className="form-label" style={{ fontSize: '0.8rem' }}>Equipo B (Visitante)</label>
+                                <input
+                                  type="text"
+                                  className="form-input"
+                                  style={{ padding: '0.6rem 0.8rem', fontSize: '0.95rem' }}
+                                  value={editEquipoB}
+                                  onChange={(e) => setEditEquipoB(e.target.value)}
+                                  required
+                                />
+                              </div>
+                              <div style={{ gridColumn: 'span 2', display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+                                <button type="submit" className="btn btn-accent" style={{ padding: '0.5rem 1.25rem', fontSize: '0.9rem', width: 'auto', height: 'auto' }} disabled={editLoading}>
+                                  {editLoading ? 'Guardando...' : 'Guardar Detalles'}
+                                </button>
+                                <button type="button" onClick={() => setEditingMatchId(null)} className="btn btn-outline" style={{ padding: '0.5rem 1.25rem', fontSize: '0.9rem', width: 'auto', height: 'auto' }}>
+                                  Cancelar
+                                </button>
+                              </div>
+                            </form>
+                          </div>
+                        );
+                      }
 
                       return (
                         <div key={m.id} className={`card ${styles.matchCard}`}>
                           
-                          {/* Detalle fecha/grupo */}
-                          <div className={styles.matchHeader}>
-                            <span>{m.grupo_fase}</span>
-                            <span>{new Date(m.fecha_hora).toLocaleDateString()}</span>
+                          {/* Detalle fecha/grupo y botón Editar */}
+                          <div className={styles.matchHeader} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                              <span>{m.grupo_fase}</span>
+                              <span style={{ color: 'var(--text-muted)' }}>|</span>
+                              <span>{new Date(m.fecha_hora).toLocaleDateString()} {new Date(m.fecha_hora).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} hs</span>
+                            </div>
+                            <button
+                              onClick={() => {
+                                setEditingMatchId(m.id);
+                                setEditEquipoA(m.equipo_a);
+                                setEditEquipoB(m.equipo_b);
+                                setEditGrupoFase(m.grupo_fase);
+                                setEditFechaHora(m.fecha_hora);
+                              }}
+                              className="btn btn-outline"
+                              style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem', width: 'auto', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '4px', height: 'auto' }}
+                            >
+                              ✏️ Editar Datos
+                            </button>
                           </div>
-
+  
                           <div className={styles.matchBody}>
                             {/* Equipo A */}
                             <div className={styles.teamRowA}>
                               <span>{m.equipo_a}</span>
                             </div>
-
+  
                             {/* Cargar Goles */}
                             <div className={styles.scoreControl}>
                               <div className={styles.scoreInputsRow}>
@@ -709,7 +838,7 @@ export default function AdminDashboard() {
                                   onChange={(e) => handleScoreChange(m.id, 'a', e.target.value)}
                                   placeholder="-"
                                 />
-                                <span className={styles.vsDivider}>VS</span>
+                                <span style={{ fontWeight: '800', color: 'var(--text-muted)' }}>VS</span>
                                 <input
                                   type="text"
                                   maxLength="2"
@@ -720,8 +849,8 @@ export default function AdminDashboard() {
                                   placeholder="-"
                                 />
                               </div>
-
-                              <div className={styles.adminActionsRow}>
+  
+                              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.25rem', justifyContent: 'center' }}>
                                 {/* Botón Guardar */}
                                 <button
                                   onClick={() => handleSaveResult(m.id)}
@@ -731,7 +860,7 @@ export default function AdminDashboard() {
                                   <Save size={12} />
                                   Guardar
                                 </button>
-
+  
                                 {/* Botón Resetear si ya se jugó */}
                                 {isPlayed && (
                                   <button
@@ -745,13 +874,13 @@ export default function AdminDashboard() {
                                 )}
                               </div>
                             </div>
-
+  
                             {/* Equipo B */}
                             <div className={styles.teamRowB}>
                               <span>{m.equipo_b}</span>
                             </div>
                           </div>
-
+  
                         </div>
                       );
                     })
@@ -759,7 +888,6 @@ export default function AdminDashboard() {
                 </div>
               </div>
             )}
-
             {/* Pestaña: Configuración y Respaldo */}
             {activeTab === 'config' && (
               <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>

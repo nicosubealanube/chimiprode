@@ -49,6 +49,22 @@ export async function POST(request) {
       return Response.json({ success: true, message: 'Partido creado exitosamente.' });
     }
 
+    if (action === 'edit') {
+      const { matchId, equipoA, equipoB, grupoFase, fechaHora } = body;
+      if (!matchId || !equipoA || !equipoA.trim() || !equipoB || !equipoB.trim() || !grupoFase || !grupoFase.trim() || !fechaHora) {
+        return Response.json({ error: 'Todos los campos son obligatorios.' }, { status: 400 });
+      }
+
+      await db.execute({
+        sql: `UPDATE matches 
+              SET equipo_a = ?, equipo_b = ?, grupo_fase = ?, fecha_hora = ? 
+              WHERE id = ?`,
+        args: [equipoA.trim(), equipoB.trim(), grupoFase.trim(), fechaHora, matchId]
+      });
+
+      return Response.json({ success: true, message: 'Detalles del partido actualizados exitosamente.' });
+    }
+
     const { matchId, golesA, golesB, estado } = body;
 
     if (matchId === undefined) {
