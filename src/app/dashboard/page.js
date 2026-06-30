@@ -189,18 +189,29 @@ export default function Dashboard() {
     return fullName.includes(searchTerm.toLowerCase()) || entry.dni.includes(searchTerm);
   });
 
-  // Verificar si un partido está cerrado (1 hora antes de que comience)
+  // Verificar si un partido está cerrado (1 hora antes de que comience) con zona horaria de Argentina (-03:00)
   const isMatchClosed = (matchDateString) => {
     const now = new Date();
-    const matchTime = new Date(matchDateString);
+    const matchTime = (matchDateString.includes('Z') || matchDateString.match(/[\+\-]\d{2}:\d{2}$/))
+      ? new Date(matchDateString)
+      : new Date(`${matchDateString}-03:00`);
     const limitTime = new Date(matchTime.getTime() - 1 * 60 * 60 * 1000);
     return now >= limitTime;
   };
 
-  // Formatear fecha legible
+  // Formatear fecha legible en huso horario de Argentina
   const formatMatchDate = (dateString) => {
-    const options = { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' };
-    const date = new Date(dateString);
+    const options = { 
+      weekday: 'long', 
+      day: 'numeric', 
+      month: 'long', 
+      hour: '2-digit', 
+      minute: '2-digit',
+      timeZone: 'America/Argentina/Buenos_Aires'
+    };
+    const date = (dateString.includes('Z') || dateString.match(/[\+\-]\d{2}:\d{2}$/))
+      ? new Date(dateString)
+      : new Date(`${dateString}-03:00`);
     // Cambiar primer letra a mayúscula
     const formatted = date.toLocaleDateString('es-AR', options);
     return formatted.charAt(0).toUpperCase() + formatted.slice(1) + ' hs';

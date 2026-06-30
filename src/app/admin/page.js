@@ -47,6 +47,16 @@ export default function AdminDashboard() {
   const [editFechaHora, setEditFechaHora] = useState('');
   const [editLoading, setEditLoading] = useState(false);
 
+  const formatAdminMatchDate = (dateStr) => {
+    if (!dateStr) return '';
+    const d = (dateStr.includes('Z') || dateStr.match(/[\+\-]\d{2}:\d{2}$/))
+      ? new Date(dateStr)
+      : new Date(`${dateStr}-03:00`);
+    const dateFormatted = d.toLocaleDateString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' });
+    const timeFormatted = d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Argentina/Buenos_Aires' });
+    return `${dateFormatted} ${timeFormatted} hs`;
+  };
+
   const verifyAndLoad = async (token) => {
     setLoading(true);
     setError('');
@@ -803,7 +813,7 @@ O ingresá los resultados reales de forma manual a continuación. Al guardar, se
                             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                               <span>{m.grupo_fase}</span>
                               <span style={{ color: 'var(--text-muted)' }}>|</span>
-                              <span>{new Date(m.fecha_hora).toLocaleDateString()} {new Date(m.fecha_hora).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} hs</span>
+                              <span>{formatAdminMatchDate(m.fecha_hora)}</span>
                             </div>
                             <button
                               onClick={() => {

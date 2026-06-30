@@ -72,6 +72,7 @@ export async function POST(request) {
       .filter(id => id !== undefined && id !== null);
 
     let dbMatches = [];
+    let dbPredictions = [];
     if (matchIds.length > 0) {
       const placeholders = matchIds.map(() => '?').join(',');
       const dbMatchesRes = await db.execute({
@@ -79,6 +80,12 @@ export async function POST(request) {
         args: matchIds
       });
       dbMatches = dbMatchesRes.rows;
+
+      const dbPredsRes = await db.execute({
+        sql: `SELECT * FROM predictions WHERE user_dni = ? AND match_id IN (${placeholders})`,
+        args: [dni, ...matchIds]
+      });
+      dbPredictions = dbPredsRes.rows;
     }
 
     for (const pred of predictions) {
@@ -94,19 +101,31 @@ export async function POST(request) {
         continue;
       }
 
-      // Verificar el bloqueo por horario (1 hora antes)
-      const matchTime = new Date(match.fecha_hora);
-      const limitTime = new Date(matchTime.getTime() - 1 * 60 * 60 * 1000);
-      if (now >= limitTime || match.estado === 'jugado') {
-        errors.push(`El partido ${match.equipo_a} vs ${match.equipo_b} ya comenzó o falta menos de 1 hora para su inicio. No podés cambiar tu predicción.`);
-        continue;
-      }
-
       const cleanGolesA = parseInt(golesA, 10);
       const cleanGolesB = parseInt(golesB, 10);
 
       if (isNaN(cleanGolesA) || isNaN(cleanGolesB)) {
         errors.push(`Los goles para ${match.equipo_a} vs ${match.equipo_b} deben ser números.`);
+        continue;
+      }
+
+      // Verificar el bloqueo por horario (1 hora antes) con zona horaria de Argentina (-03:00)
+      const dateStr = match.fecha_hora;
+      const matchTime = (dateStr.includes('Z') || dateStr.match(/[\+\-]\d{2}:\d{2}$/))
+        ? new Date(dateStr)
+        : new Date(`${dateStr}-03:00`);
+      const limitTime = new Date(matchTime.getTime() - 1 * 60 * 60 * 1000);
+
+      if (now >= limitTime || match.estado === 'jugado') {
+        // Encontrar si ya existe una predicción para este partido
+        const existing = dbPredictions.find(p => Number(p.match_id) === Number(matchId));
+        const isChanged = !existing || 
+                          Number(existing.goles_a) !== cleanGolesA || 
+                          Number(existing.goles_b) !== cleanGolesB;
+
+        if (isChanged) {
+          errors.push(`El partido ${match.equipo_a} vs ${match.equipo_b} ya comenzó o falta menos de 1 hora para su inicio. No podés cambiar tu predicción.`);
+        }
         continue;
       }
 
